@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # file_manager
 
 A new Flutter application.
@@ -14,3 +15,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# flutter_file_manager
+一个 双栏 Flutter 文件管理器
+>>>>>>> 903fff52b7a21dec7d738c60e8e02f058fead1cd
