@@ -60,15 +60,14 @@ class _MyHomePageState extends State<MyHome> {
     return WillPopScope(
       onWillPop: onWillPop,
       child: Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppBar(
           title: Text(
             parentDir?.path == Common().sDCardDir
                 ? 'SD card'
                 : p.basename(parentDir.path),
-            style: TextStyle(color: Colors.black),
           ),
           centerTitle: true,
-          backgroundColor: Color(0xffeeeeee),
           elevation: 5.0,
           //浮起来的高度
           leading: parentDir?.path == Common().sDCardDir
@@ -76,7 +75,6 @@ class _MyHomePageState extends State<MyHome> {
               : IconButton(
                   icon: Icon(
                     Icons.chevron_left,
-                    color: Colors.black,
                   ),
                   onPressed: onWillPop,
                 ), //再标题前面显示的一个控件
@@ -92,12 +90,13 @@ class _MyHomePageState extends State<MyHome> {
           ],
         ),
         bottomNavigationBar: CupertinoTabBar(
+          backgroundColor: Colors.black,
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.menu),
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.menu),
+                icon: Icon(Icons.star),
             ),
             BottomNavigationBarItem(
                 icon: Icon(Icons.menu),
@@ -138,8 +137,9 @@ class _MyHomePageState extends State<MyHome> {
     return InkWell(
       child: Container(
         decoration: BoxDecoration(
+          color: Colors.black,
           border:
-              Border(bottom: BorderSide(width: 0.5, color: Color(0xffe5e5e5))),
+              Border(bottom: BorderSide(width: 0.5,color: Colors.black12)),
         ),
         child: ListTile(
           leading: Image.asset(
@@ -147,19 +147,14 @@ class _MyHomePageState extends State<MyHome> {
             height: 40.0,
             width: 40.0,
           ),
-
-          ///TODO 解释p.etension
           title: Text(file.path.substring(file.parent.path.length + 1),
               style: TextStyle(fontSize: fileFontSize)),
-
           ///从文件路径中截取文件名字 (file.parent.length+1-文件父目录长度)
           subtitle: Text(
             '$modifiledTime ${Common().getFileSize(file.statSync().size)}',
             style: TextStyle(fontSize: subTitleFontSize),
           ), //时间和文件大小
         ),
-        //TODO onTap()
-        //TODO onLongPress()
       ),
       onTap: () {
         OpenFile.open(file.path);
@@ -180,7 +175,6 @@ class _MyHomePageState extends State<MyHome> {
                     child: Card(
                       margin: EdgeInsets.only(
                           left: 5, right: 5, top: 20, bottom: 20),
-                      color: Colors.white,
                       child: InkWell(
                         child: Center(
                           child: Padding(
@@ -198,14 +192,31 @@ class _MyHomePageState extends State<MyHome> {
                   Container(
                     width: 170,
                     child: Card(
-                      margin: EdgeInsets.only(left: 5, right: 5, bottom: 50),
-                      color: Colors.white,
+                      margin: EdgeInsets.only(left: 5, right: 5,bottom: 20),
+                      child: InkWell(
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text('收藏',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                        ),
+                        onTap: () {
+                          addToFavorite(file);
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 170,
+                    child: Card(
+                      margin: EdgeInsets.only(left: 5, right: 5,bottom: 50),
                       child: InkWell(
                         child: Center(
                           child: Padding(
                             padding: EdgeInsets.all(10),
                             child: Text('删除',
-                                style: TextStyle(color: Colors.blue)),
+                                style: TextStyle(color: Colors.red)),
                           ),
                         ),
                         onTap: () {
@@ -228,8 +239,9 @@ class _MyHomePageState extends State<MyHome> {
     return InkWell(
       child: Container(
         decoration: BoxDecoration(
+          color: Colors.black,
           border:
-              Border(bottom: BorderSide(width: 0.5, color: Color(0xffe5e5e5))),
+              Border(bottom: BorderSide(width: 0.5,color: Colors.black12)),
         ),
         child: ListTile(
           leading: Image.asset(
@@ -273,7 +285,6 @@ class _MyHomePageState extends State<MyHome> {
                     child: Card(
                       margin: EdgeInsets.only(
                           left: 5, right: 5, top: 20, bottom: 20),
-                      color: Colors.white,
                       child: InkWell(
                         child: Center(
                           child: Padding(
@@ -291,14 +302,31 @@ class _MyHomePageState extends State<MyHome> {
                   Container(
                     width: 170,
                     child: Card(
+                      margin: EdgeInsets.only(left: 5, right: 5,bottom: 20),
+                      child: InkWell(
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text('收藏',
+                                style: TextStyle(color: Colors.orange)),
+                          ),
+                        ),
+                        onTap: () {
+                          addToFavorite(file);
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 170,
+                    child: Card(
                       margin: EdgeInsets.only(left: 5, right: 5, bottom: 50),
-                      color: Colors.white,
                       child: InkWell(
                         child: Center(
                           child: Padding(
                             padding: EdgeInsets.all(10),
                             child: Text('删除',
-                                style: TextStyle(color: Colors.blue)),
+                                style: TextStyle(color: Colors.red)),
                           ),
                         ),
                         onTap: () {
@@ -316,6 +344,26 @@ class _MyHomePageState extends State<MyHome> {
 
   //////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////
+
+  void addToFavorite(FileSystemEntity file){
+    showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context){
+          return CupertinoAlertDialog(
+            title: Text('添加成功'),
+            actions: <Widget>[
+              CupertinoDialogAction(
+                child: Text('确定'),
+                onPressed: (){
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+          Navigator.pop(context);
+        }
+    );
+  }
 //  删除文件
   void deleteFile(FileSystemEntity file, int type) {
     showCupertinoDialog(
