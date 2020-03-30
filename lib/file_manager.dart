@@ -24,6 +24,7 @@ class _MyHomePageState extends State<MyHome> {
   List<FileSystemEntity> leftFiles = []; //左列的文件
   List<FileSystemEntity> rightFiles = []; //右列的文件
 
+  int _selectedIndex=-1;
   double iconHight = 40.0;
   double iconWidth = 40.0;
   double fileFontSize = 10.0;
@@ -102,6 +103,13 @@ class _MyHomePageState extends State<MyHome> {
                 icon: Icon(Icons.menu),
             )
           ],
+          currentIndex:_selectedIndex,
+          onTap: (int a){
+            setState(() {
+              _selectedIndex = a;
+            });
+            print('按了'+a.toString());
+          },
         ),
       ),
     );
@@ -346,6 +354,16 @@ class _MyHomePageState extends State<MyHome> {
   /////////////////////////////////////////////////////////
 
   void addToFavorite(FileSystemEntity file){
+    try{
+      File favoriteTxt=File(Common().favoriteDir+'/favorite.txt');
+      print('最开始'+Common().favoriteAll);
+      Common().favoriteAll=Common().favoriteAll+'\n'+file.path.toString();
+      Common().favoriteFileList.add(file.path.toString());
+      favoriteTxt.writeAsStringSync(Common().favoriteAll);
+      print('收藏'+file.path);
+    }catch(err){
+      print('错误信息'+err.toString());
+    }
     showCupertinoDialog(
         context: context,
         builder: (BuildContext context){

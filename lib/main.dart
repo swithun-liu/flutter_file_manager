@@ -18,6 +18,25 @@ void main() {
     //获取SD卡根路径  path_provider提供方法
 //    Common().sDCardDir = (await getExternalStorageDirectory()).path;
     Common().sDCardDir = '/storage/emulated/0';
+    Common().favoriteDir=(await getExternalStorageDirectory()).path;
+
+    try{
+      File favoriteTxt=File(Common().favoriteDir+'/favorite.txt');
+      if(await favoriteTxt.exists()){
+        Common().favoriteAll=favoriteTxt.readAsStringSync();
+        print('读取favourite.txt');
+        Common().favoriteFileList=Common().favoriteAll.split('\n');
+      }else{
+        favoriteTxt.create();
+        print('创建favourite.txt');
+      }
+    }catch(err){
+      print(err);
+    }
+//    print('1. getApplicationDocumentsDirectory:  '+(await getApplicationDocumentsDirectory()).path);
+//    print('2. getApplicationSupportDirectory:  '+(await getApplicationSupportDirectory()).path);
+//    print('3. getLibraryDirectory:  '+(await getLibraryDirectory()).path);
+//    print('4. getExternalStrorageDirectory:  '+(await getExternalStorageDirectory()).path);
   }
 
   //获取权限函数
