@@ -33,10 +33,6 @@ void main() {
     }catch(err){
       print(err);
     }
-//    print('1. getApplicationDocumentsDirectory:  '+(await getApplicationDocumentsDirectory()).path);
-//    print('2. getApplicationSupportDirectory:  '+(await getApplicationSupportDirectory()).path);
-//    print('3. getLibraryDirectory:  '+(await getLibraryDirectory()).path);
-//    print('4. getExternalStrorageDirectory:  '+(await getExternalStorageDirectory()).path);
   }
 
   //获取权限函数

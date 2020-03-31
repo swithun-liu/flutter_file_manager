@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,10 @@ class _MyHomePageState extends State<MyHome> {
   List<FileSystemEntity> leftFiles = []; //左列的文件
   List<FileSystemEntity> rightFiles = []; //右列的文件
 
-  int _selectedIndex=-1;
+//  bool favoriteModel = false;
+  bool cutModel = false; //是否点了剪切文件
+  bool copyModel = false; //是否点了复制文件
+  int cardColor = 0x22ffffff;
   double iconHight = 40.0;
   double iconWidth = 40.0;
   double fileFontSize = 10.0;
@@ -32,6 +36,7 @@ class _MyHomePageState extends State<MyHome> {
   Directory parentDir; //父目录
   ScrollController controller = ScrollController();
   List<double> position = [];
+  FileSystemEntity copyTempFile = null;
 
   ///初始化: 拿到根路径 刷新目录
   @override
@@ -43,7 +48,8 @@ class _MyHomePageState extends State<MyHome> {
 
   ///用于导航返回拦截器的onWillPop
   Future<bool> onWillPop() async {
-    if (parentDir.parent.path != Common().sDCardDir) {
+    if (parentDir.parent.path != Common().sDCardDir &&
+        parentDir.path != Common().sDCardDir) {
       /// 如果不是根目录,就跳转到上层目录并刷新目录
       initPathFiles(parentDir.path, 2);
     } else {
@@ -90,26 +96,43 @@ class _MyHomePageState extends State<MyHome> {
             )
           ],
         ),
-        bottomNavigationBar: CupertinoTabBar(
-          backgroundColor: Colors.black,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu),
+        bottomNavigationBar: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+              child: CupertinoButton(
+                child: Icon(Icons.add),
+                onPressed: () {
+                  moreAction(-1);
+                },
+              ),
             ),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.star),
+            Expanded(
+              child: CupertinoButton(
+                child: Icon(Icons.home),
+                onPressed: () {
+                  initPathFiles(Common().sDCardDir, -2); //刷新左列目录
+                },
+              ),
             ),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.menu),
-            )
+            Expanded(
+              child: CupertinoButton(
+                child: Icon(Icons.favorite),
+                onPressed: () {
+                  listFavorite();
+                },
+              ),
+            ),
+            Expanded(
+              child: CupertinoButton(
+                child: Icon(Icons.add),
+                onPressed: () {
+                  moreAction(1);
+                },
+              ),
+            ),
           ],
-          currentIndex:_selectedIndex,
-          onTap: (int a){
-            setState(() {
-              _selectedIndex = a;
-            });
-            print('按了'+a.toString());
-          },
         ),
       ),
     );
@@ -146,8 +169,7 @@ class _MyHomePageState extends State<MyHome> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.black,
-          border:
-              Border(bottom: BorderSide(width: 0.5,color: Colors.black12)),
+          border: Border(bottom: BorderSide(width: 0.5, color: Colors.black12)),
         ),
         child: ListTile(
           leading: Image.asset(
@@ -157,6 +179,7 @@ class _MyHomePageState extends State<MyHome> {
           ),
           title: Text(file.path.substring(file.parent.path.length + 1),
               style: TextStyle(fontSize: fileFontSize)),
+
           ///从文件路径中截取文件名字 (file.parent.length+1-文件父目录长度)
           subtitle: Text(
             '$modifiledTime ${Common().getFileSize(file.statSync().size)}',
@@ -172,69 +195,142 @@ class _MyHomePageState extends State<MyHome> {
             backgroundColor: Color(0x00000000),
             context: context,
             builder: (BuildContext context) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: type == -1
-                    ? CrossAxisAlignment.start
-                    : CrossAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    width: 170,
-                    child: Card(
-                      margin: EdgeInsets.only(
-                          left: 5, right: 5, top: 20, bottom: 20),
-                      child: InkWell(
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text('重命名',
-                                style: TextStyle(color: Colors.blue)),
-                          ),
-                        ),
-                        onTap: () {
-                          renameFile(file, type);
-                        },
-                      ),
-                    ),
+              return BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: 5.0,
+                    sigmaY: 5.0,
                   ),
-                  Container(
-                    width: 170,
-                    child: Card(
-                      margin: EdgeInsets.only(left: 5, right: 5,bottom: 20),
-                      child: InkWell(
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text('收藏',
-                                style: TextStyle(color: Colors.orange)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: type == -1
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin: EdgeInsets.only(
+                              left: 5, right: 5, top: 20, bottom: 20),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('重命名',
+                                    style: TextStyle(color: Colors.blue)),
+                              ),
+                            ),
+                            onTap: () {
+                              renameFile(file, type);
+                            },
                           ),
                         ),
-                        onTap: () {
-                          addToFavorite(file);
-                        },
                       ),
-                    ),
-                  ),
-                  Container(
-                    width: 170,
-                    child: Card(
-                      margin: EdgeInsets.only(left: 5, right: 5,bottom: 50),
-                      child: InkWell(
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text('删除',
-                                style: TextStyle(color: Colors.red)),
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin:
+                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('复制',
+                                    style: TextStyle(color: Colors.blueAccent)),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              copyToDir(file);
+                            },
                           ),
                         ),
-                        onTap: () {
-                          deleteFile(file, type);
-                        },
                       ),
-                    ),
-                  )
-                ],
-              );
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin:
+                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('剪切',
+                                    style: TextStyle(color: Colors.lightBlue)),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              cutToDir(file);
+                            },
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin:
+                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('收藏',
+                                    style: TextStyle(color: Colors.cyan)),
+                              ),
+                            ),
+                            onTap: () {
+                              addToFavorite(file);
+                            },
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin:
+                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('取消收藏',
+                                    style: TextStyle(color: Colors.cyanAccent)),
+                              ),
+                            ),
+                            onTap: () {
+                              removeFavorite(file);
+                            },
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin:
+                              EdgeInsets.only(left: 5, right: 5, bottom: 50),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('删除',
+                                    style: TextStyle(color: Colors.blueGrey)),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              deleteFile(file, type);
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ));
             });
       },
     );
@@ -248,8 +344,7 @@ class _MyHomePageState extends State<MyHome> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.black,
-          border:
-              Border(bottom: BorderSide(width: 0.5,color: Colors.black12)),
+          border: Border(bottom: BorderSide(width: 0.5, color: Colors.black12)),
         ),
         child: ListTile(
           leading: Image.asset(
@@ -282,69 +377,107 @@ class _MyHomePageState extends State<MyHome> {
             backgroundColor: Color(0x00000000),
             context: context,
             builder: (BuildContext context) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: type == -1
-                    ? CrossAxisAlignment.start
-                    : CrossAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    width: 170,
-                    child: Card(
-                      margin: EdgeInsets.only(
-                          left: 5, right: 5, top: 20, bottom: 20),
-                      child: InkWell(
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text('重命名',
-                                style: TextStyle(color: Colors.blue)),
+              return BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 5.0,
+                  sigmaY: 5.0,
+                ),
+                child: Container(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: type == -1
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin: EdgeInsets.only(
+                              left: 5, right: 5, top: 20, bottom: 20),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('重命名',
+                                    style: TextStyle(color: Colors.blue)),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              renameFile(file, type);
+                            },
                           ),
                         ),
-                        onTap: () {
-                          renameFile(file, type);
-                        },
                       ),
-                    ),
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin:
+                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('收藏',
+                                    style: TextStyle(color: Colors.cyan)),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              addToFavorite(file);
+                            },
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin:
+                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('取消收藏',
+                                    style: TextStyle(color: Colors.cyanAccent)),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              removeFavorite(file);
+                            },
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 170,
+                        child: Card(
+                          color: Color(cardColor),
+                          margin:
+                              EdgeInsets.only(left: 5, right: 5, bottom: 50),
+                          child: InkWell(
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('删除',
+                                    style: TextStyle(color: Colors.blueGrey)),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              deleteFile(file, type);
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    width: 170,
-                    child: Card(
-                      margin: EdgeInsets.only(left: 5, right: 5,bottom: 20),
-                      child: InkWell(
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text('收藏',
-                                style: TextStyle(color: Colors.orange)),
-                          ),
-                        ),
-                        onTap: () {
-                          addToFavorite(file);
-                        },
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 170,
-                    child: Card(
-                      margin: EdgeInsets.only(left: 5, right: 5, bottom: 50),
-                      child: InkWell(
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text('删除',
-                                style: TextStyle(color: Colors.red)),
-                          ),
-                        ),
-                        onTap: () {
-                          deleteFile(file, type);
-                        },
-                      ),
-                    ),
-                  )
-                ],
+                ),
               );
+
             });
       },
     );
@@ -352,37 +485,246 @@ class _MyHomePageState extends State<MyHome> {
 
   //////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
 
-  void addToFavorite(FileSystemEntity file){
-    try{
-      File favoriteTxt=File(Common().favoriteDir+'/favorite.txt');
-      print('最开始'+Common().favoriteAll);
-      Common().favoriteAll=Common().favoriteAll+'\n'+file.path.toString();
-      Common().favoriteFileList.add(file.path.toString());
+  //粘贴要复制的文件
+  //左右两边的加号
+  void moreAction(int side) {
+    String destinationDir = '';
+    if (side == -1) {
+      destinationDir = parentDir.parent.path;
+    } else {
+      destinationDir = parentDir.path;
+    }
+    showModalBottomSheet(
+        backgroundColor: Color(0x00000000),
+        context: context,
+        builder: (BuildContext context) {
+          return copyModel | cutModel
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: side == -1
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      width: 170,
+                      child: Card(
+                        margin: EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                        child: InkWell(
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Text('粘贴',
+                                  style: TextStyle(color: Colors.blue)),
+                            ),
+                          ),
+                          onTap: () {
+                            if (copyTempFile.statSync().type ==
+                                FileSystemEntityType.file) {
+                              String path = copyTempFile.path;
+                              File temp = copyTempFile;
+                              print('剪切的文件 ' + temp.path);
+                              temp.copy(destinationDir +
+                                  '/' +
+                                  temp.path
+                                      .substring(temp.parent.path.length + 1));
+                              copyTempFile = null; //复制之后取消复制模式
+                              if (cutModel) {
+                                temp = File(path);
+                                temp.delete();
+                                print('删除' + temp.path);
+                              }
+                              if (side == -1) {
+                                initPathFiles(parentDir.path, -3);
+                              } else {
+                                initPathFiles(parentDir.path, -3);
+                              }
+                              copyModel = false;
+                              cutModel = false;
+                              Navigator.pop(context);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 170,
+                      child: Card(
+                        margin: EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                        child: InkWell(
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Text('取消',
+                                  style: TextStyle(color: Colors.cyanAccent)),
+                            ),
+                          ),
+                          onTap: () {
+                            copyModel = false;
+                            copyTempFile = null; //取消复制模式
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    )
+                  ],
+                )
+              : Container(
+                  width: 0,
+                );
+        });
+  }
+
+  //复制文件到
+  void copyToDir(FileSystemEntity file) {
+    cutModel = false;
+    copyModel = true;
+    copyTempFile = file;
+  }
+
+  //剪切文件到
+  void cutToDir(FileSystemEntity file) {
+    copyModel = false;
+    cutModel = true;
+    copyTempFile = file;
+  }
+
+  //将更新后的喜爱条目写回文件
+  void writeIntoLocal() {
+    String temp = '';
+    int i = 0;
+    for (var item in Common().favoriteFileList) {
+      print('写入' + item);
+      if (i == 0) {
+        temp = item.toString();
+      } else {
+        temp = temp + '\n' + item.toString();
+      }
+      i++;
+    }
+    Common().favoriteAll = temp;
+    try {
+      File favoriteTxt = File(Common().favoriteDir + '/favorite.txt');
       favoriteTxt.writeAsStringSync(Common().favoriteAll);
-      print('收藏'+file.path);
-    }catch(err){
-      print('错误信息'+err.toString());
+    } catch (err) {
+      print('错误信息' + err.toString());
+    }
+  }
+
+  //文件是否在favorite中
+  bool isInFavorite(String filePath) {
+    bool flag = false;
+    for (var fileItem in Common().favoriteFileList) {
+      if (fileItem == filePath) {
+        flag = true;
+      }
+    }
+    return flag;
+  }
+
+  //切换favorite
+  void listFavorite() {
+    setState(() {
+      leftFiles.clear();
+      rightFiles.clear();
+      if (Common().favoriteFileList != null) {
+        for (var fileItem in Common().favoriteFileList) {
+          print(fileItem);
+          leftFiles.add(new File(fileItem));
+        }
+      }
+    });
+  }
+
+  //添加到favorite
+  void addToFavorite(FileSystemEntity file) {
+    bool flag = isInFavorite(file.path);
+    if (!flag) {
+      try {
+        File favoriteTxt = File(Common().favoriteDir + '/favorite.txt');
+        favoriteTxt.copy(Common().sDCardDir + '/1/test.txt');
+        if (Common().favoriteAll.length > 0) {
+          Common().favoriteAll =
+              Common().favoriteAll + '\n' + file.path.toString();
+        } else {
+          Common().favoriteAll = Common().favoriteAll + file.path.toString();
+        }
+        Common().favoriteFileList.add(file.path.toString());
+        favoriteTxt.writeAsStringSync(Common().favoriteAll);
+        print('收藏' + file.path);
+      } catch (err) {
+        print('错误信息' + err.toString());
+      }
     }
     showCupertinoDialog(
         context: context,
-        builder: (BuildContext context){
+        builder: (BuildContext context) {
           return CupertinoAlertDialog(
-            title: Text('添加成功'),
+            title: Text(flag ? '条目已存在' : '添加成功'),
             actions: <Widget>[
               CupertinoDialogAction(
                 child: Text('确定'),
-                onPressed: (){
+                onPressed: () {
                   Navigator.pop(context);
                 },
               )
             ],
           );
           Navigator.pop(context);
-        }
-    );
+        });
   }
-//  删除文件
+
+  //从favorite中移除
+  void removeFavorite(FileSystemEntity file) {
+    bool flag = isInFavorite(file.path);
+    setState(() {
+      if (flag) {
+        //如果要取消收藏的文件在favorite条目中存在
+        int i = 0;
+        //从Common中的喜爱条目中删除它
+        for (var item in Common().favoriteFileList) {
+          print(i.toString() + '  ' + item.toString());
+          if (item.toString() == file.path) {
+            Common().favoriteFileList.removeAt(i);
+            break;
+          }
+          i++;
+        }
+        //将更新后的喜爱条目写回文件
+        writeIntoLocal();
+      }
+    });
+    showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text(flag ? '已取消收藏' : '取消收藏失败'),
+            actions: <Widget>[
+              CupertinoDialogAction(
+                child: Text('确定'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+          Navigator.pop(context);
+        });
+  }
+
+  //删除文件
   void deleteFile(FileSystemEntity file, int type) {
     showCupertinoDialog(
         context: context,
@@ -413,10 +755,13 @@ class _MyHomePageState extends State<MyHome> {
                       FileSystemEntityType.file) {
                     file.deleteSync();
                   }
+                  //TODO
                   if (type == -1) {
-                    initPathFiles(file.path, -3);
-                  } else {
-                    initPathFiles(file.parent.path, type);
+                    //删除了左边的文件
+                    initPathFiles(parentDir.path, -3);
+                  } else if (type == 1) {
+                    //删除了右边的文件
+                    initPathFiles(parentDir.path, -1);
                   }
                   Navigator.pop(context);
                 },
@@ -426,7 +771,7 @@ class _MyHomePageState extends State<MyHome> {
         });
   }
 
-//重命名文件
+  //重命名文件
   void renameFile(FileSystemEntity file, int type) {
     TextEditingController _controller = TextEditingController();
 
@@ -501,10 +846,18 @@ class _MyHomePageState extends State<MyHome> {
         });
   }
 
-  ///用传来的路径刷新该目录下的文件.文件夹
+  //用传来的路径刷新该目录下的文件.文件夹
   void initPathFiles(String path, int type) {
     try {
       //可变的Widget可以使用setState()函数--重新绘制试图--调用build方法--绘制不一样的地方
+      //-1: 右列-->父目录下  (点了左边列表,刷新右边列表,parentDir时左边的)
+      // 1: 右列-->父目录下  (点了右列的文件夹的情况,parenDir换成了右边的)
+      //    左列-->父目录同级
+      //-2: 左列-->当前父目录下 (初始化时,用sdcard刷线左列)
+      // 2: 右列-->父目录同级   (按了返回键)
+      //    左列-->父目录的父目录同级
+      //-3: 左列-->父目录同级  (原地刷新)
+      //    右列-->父目录下
       setState(() {
         parentDir = Directory(path);
         print('parentDir 更改为' + parentDir.path);
@@ -537,7 +890,7 @@ class _MyHomePageState extends State<MyHome> {
     }
   }
 
-  ///目录排序
+  //目录排序
   void sortFile(Directory parentDir, int type) {
     List<FileSystemEntity> _Files = [];
     List<FileSystemEntity> _Folders = [];

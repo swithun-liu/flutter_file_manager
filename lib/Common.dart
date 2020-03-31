@@ -20,7 +20,7 @@ class Common{
   String sDCardDir;
   //存放收藏文件夹目录的文件
   String favoriteDir;
-  List<String> favoriteFileList;
+  List<String> favoriteFileList=new List<String>();
   String favoriteAll='';
 
 
