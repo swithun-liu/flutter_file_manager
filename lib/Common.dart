@@ -53,6 +53,9 @@ class Common{
       case '.xlsx':
         iconImg = 'assets/images/excel.png';
         break;
+      case '.pdf':
+        iconImg = 'assets/images/pdf.png';
+        break;
       case '.jpg':
       case '.jpeg':
       case '.png':
@@ -61,8 +64,9 @@ class Common{
       case '.txt':
         iconImg = 'assets/images/txt.png';
         break;
+      case '.flac':
       case '.mp3':
-        iconImg = 'assets/images/mp3.png';
+        iconImg = 'assets/images/audio.png';
         break;
       case '.mp4':
         iconImg = 'assets/images/video.png';

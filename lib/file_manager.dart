@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:neofilemanager/widgetItem.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
 
@@ -29,10 +30,10 @@ class _MyHomePageState extends State<MyHome> {
   bool cutModel = false; //是否点了剪切文件
   bool copyModel = false; //是否点了复制文件
   int cardColor = 0x22ffffff;
-  double iconHight = 40.0;
-  double iconWidth = 40.0;
-  double fileFontSize = 10.0;
-  double subTitleFontSize = 8.0;
+  double iconHight = 30.0;
+  double iconWidth = 30.0;
+  double fileFontSize = 9.0;
+  double subTitleFontSize = 6.0;
   Directory parentDir; //父目录
   ScrollController controller = ScrollController();
   List<double> position = [];
@@ -81,7 +82,7 @@ class _MyHomePageState extends State<MyHome> {
               ? Container()
               : IconButton(
                   icon: Icon(
-                    Icons.chevron_left,
+                    Icons.arrow_left,
                   ),
                   onPressed: onWillPop,
                 ), //再标题前面显示的一个控件
@@ -174,8 +175,8 @@ class _MyHomePageState extends State<MyHome> {
         child: ListTile(
           leading: Image.asset(
             Common().selectIcon(p.extension(file.path)),
-            height: 40.0,
-            width: 40.0,
+            height: iconHight,
+            width: iconWidth,
           ),
           title: Text(file.path.substring(file.parent.path.length + 1),
               style: TextStyle(fontSize: fileFontSize)),
@@ -206,129 +207,18 @@ class _MyHomePageState extends State<MyHome> {
                         ? CrossAxisAlignment.start
                         : CrossAxisAlignment.end,
                     children: <Widget>[
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin: EdgeInsets.only(
-                              left: 5, right: 5, top: 20, bottom: 20),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('重命名',
-                                    style: TextStyle(color: Colors.blue)),
-                              ),
-                            ),
-                            onTap: () {
-                              renameFile(file, type);
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin:
-                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('复制',
-                                    style: TextStyle(color: Colors.blueAccent)),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                              copyToDir(file);
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin:
-                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('剪切',
-                                    style: TextStyle(color: Colors.lightBlue)),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                              cutToDir(file);
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin:
-                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('收藏',
-                                    style: TextStyle(color: Colors.cyan)),
-                              ),
-                            ),
-                            onTap: () {
-                              addToFavorite(file);
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin:
-                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('取消收藏',
-                                    style: TextStyle(color: Colors.cyanAccent)),
-                              ),
-                            ),
-                            onTap: () {
-                              removeFavorite(file);
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin:
-                              EdgeInsets.only(left: 5, right: 5, bottom: 50),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('删除',
-                                    style: TextStyle(color: Colors.blueGrey)),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                              deleteFile(file, type);
-                            },
-                          ),
-                        ),
-                      ),
+                      WidgetItem().returnFileOperateButton(
+                          context, cardColor, renameFile, '重命名', file, type),
+                      WidgetItem().returnFileOperateButton(
+                          context, cardColor, copyToDir, '复制', file, type),
+                      WidgetItem().returnFileOperateButton(
+                          context, cardColor, cutToDir, '剪切', file, type),
+                      WidgetItem().returnFileOperateButton(
+                          context, cardColor, addToFavorite, '收藏', file, type),
+                      WidgetItem().returnFileOperateButton(context, cardColor,
+                          removeFavorite, '取消收藏', file, type),
+                      WidgetItem().returnFileOperateButton(
+                          context, cardColor, deleteFile, '删除', file, type),
                     ],
                   ));
             });
@@ -340,146 +230,104 @@ class _MyHomePageState extends State<MyHome> {
     String modifiledTime = DateFormat('yyyy-MM-dd HH:mm:ss', 'zh_CN')
         .format(file.statSync().modified.toLocal());
     //InkWell: 水波纹效果
-    return InkWell(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border(bottom: BorderSide(width: 0.5, color: Colors.black12)),
-        ),
-        child: ListTile(
-          leading: Image.asset(
-            'assets/images/folder.png',
-            height: 40.0,
-            width: 40.0,
-          ),
-          title: Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(file.path.substring(file.parent.path.length + 1),
-                    style: TextStyle(fontSize: fileFontSize)),
-              ),
-            ],
-          ),
-          subtitle: Text(
-            modifiledTime,
-            style: TextStyle(fontSize: subTitleFontSize),
-          ),
-          trailing: Icon(Icons.chevron_right),
 
-          ///trailing: 和leading相对,最后面
+    return Card(
+      color: Color(0xff111111),
+      elevation: 15.0,
+      margin: EdgeInsets.only(left: 5,right: 5,bottom: 5,top: 5),
+      child: InkWell(
+        child: Container(
+          decoration: BoxDecoration(
+//            color: Colors.black,
+//            border:
+//                Border(bottom: BorderSide(width: 0.5, color: Colors.white)),
+          ),
+          child: ListTile(
+              leading: Image.asset(
+                'assets/images/folder.png',
+                height: iconHight,
+                width: iconWidth,
+              ),
+              title: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                        file.path.substring(file.parent.path.length + 1),
+                        style: TextStyle(fontSize: fileFontSize)),
+                  ),
+                ],
+              ),
+              subtitle: Text(
+                modifiledTime,
+                style: TextStyle(fontSize: subTitleFontSize),
+              ),
+              trailing: Icon(
+                Icons.arrow_right,
+                size: 12.0,
+              )
+
+              ///trailing: 和leading相对,最后面
+              ),
+        ),
+        onTap: () {
+          initPathFiles(file.path, type);
+        },
+        onLongPress: () {
+          showModalBottomSheet(
+              backgroundColor: Color(0x00000000),
+              context: context,
+              builder: (BuildContext context) {
+                return BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: 5.0,
+                    sigmaY: 5.0,
+                  ),
+                  child: Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: type == -1
+                          ? CrossAxisAlignment.start
+                          : CrossAxisAlignment.end,
+                      children: <Widget>[
+                        WidgetItem().returnFileOperateButton(
+                            context, cardColor, renameFile, '重命名', file, type),
+                        WidgetItem().returnFileOperateButton(context, cardColor,
+                            addToFavorite, '收藏', file, type),
+                        WidgetItem().returnFileOperateButton(context, cardColor,
+                            removeFavorite, '取消收藏', file, type),
+                        WidgetItem().returnFileOperateButton(
+                            context, cardColor, deleteFile, '删除', file, type),
+                      ],
+                    ),
+                  ),
+                );
+              });
+        },
+      ),
+    );
+
+  }
+
+  Widget returnFileOperateButton(int cardColor,
+      Function(FileSystemEntity file) fun, FileSystemEntity file) {
+    return Container(
+      width: 170,
+      child: Card(
+        color: Color(cardColor),
+        margin: EdgeInsets.only(left: 5, right: 5, bottom: 20),
+        child: InkWell(
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: Text('收藏', style: TextStyle(color: Colors.cyan)),
+            ),
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            fun(file);
+          },
         ),
       ),
-      onTap: () {
-        initPathFiles(file.path, type);
-      },
-      onLongPress: () {
-        showModalBottomSheet(
-            backgroundColor: Color(0x00000000),
-            context: context,
-            builder: (BuildContext context) {
-              return BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 5.0,
-                  sigmaY: 5.0,
-                ),
-                child: Container(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: type == -1
-                        ? CrossAxisAlignment.start
-                        : CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin: EdgeInsets.only(
-                              left: 5, right: 5, top: 20, bottom: 20),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('重命名',
-                                    style: TextStyle(color: Colors.blue)),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                              renameFile(file, type);
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin:
-                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('收藏',
-                                    style: TextStyle(color: Colors.cyan)),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                              addToFavorite(file);
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin:
-                              EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('取消收藏',
-                                    style: TextStyle(color: Colors.cyanAccent)),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                              removeFavorite(file);
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 170,
-                        child: Card(
-                          color: Color(cardColor),
-                          margin:
-                              EdgeInsets.only(left: 5, right: 5, bottom: 50),
-                          child: InkWell(
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text('删除',
-                                    style: TextStyle(color: Colors.blueGrey)),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                              deleteFile(file, type);
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-
-            });
-      },
     );
   }
 
@@ -511,91 +359,108 @@ class _MyHomePageState extends State<MyHome> {
         backgroundColor: Color(0x00000000),
         context: context,
         builder: (BuildContext context) {
-          return copyModel | cutModel
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: side == -1
-                      ? CrossAxisAlignment.start
-                      : CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Container(
-                      width: 170,
-                      child: Card(
-                        margin: EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                        child: InkWell(
-                          child: Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Text('粘贴',
-                                  style: TextStyle(color: Colors.blue)),
+          return BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 5.0,
+              sigmaY: 5.0,
+            ),
+            child: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: side == -1
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.end,
+                children: <Widget>[
+                  copyModel | cutModel
+                      ? Column(
+                          children: <Widget>[
+                            Container(
+                              width: 170,
+                              child: Card(
+                                margin: EdgeInsets.only(
+                                    left: 5, right: 5, bottom: 20),
+                                child: InkWell(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('粘贴',
+                                          style: TextStyle(color: Colors.blue)),
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    if (copyTempFile.statSync().type ==
+                                        FileSystemEntityType.file) {
+                                      String path = copyTempFile.path;
+                                      File temp = copyTempFile;
+                                      print('剪切的文件 ' + temp.path);
+                                      temp.copy(destinationDir +
+                                          '/' +
+                                          temp.path.substring(
+                                              temp.parent.path.length + 1));
+                                      copyTempFile = null; //复制之后取消复制模式
+                                      if (cutModel) {
+                                        temp = File(path);
+                                        temp.delete();
+                                        print('删除' + temp.path);
+                                      }
+                                      if (side == -1) {
+                                        initPathFiles(parentDir.path, -3);
+                                      } else {
+                                        initPathFiles(parentDir.path, -3);
+                                      }
+                                      copyModel = false;
+                                      cutModel = false;
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                ),
+                              ),
                             ),
-                          ),
-                          onTap: () {
-                            if (copyTempFile.statSync().type ==
-                                FileSystemEntityType.file) {
-                              String path = copyTempFile.path;
-                              File temp = copyTempFile;
-                              print('剪切的文件 ' + temp.path);
-                              temp.copy(destinationDir +
-                                  '/' +
-                                  temp.path
-                                      .substring(temp.parent.path.length + 1));
-                              copyTempFile = null; //复制之后取消复制模式
-                              if (cutModel) {
-                                temp = File(path);
-                                temp.delete();
-                                print('删除' + temp.path);
-                              }
-                              if (side == -1) {
-                                initPathFiles(parentDir.path, -3);
-                              } else {
-                                initPathFiles(parentDir.path, -3);
-                              }
-                              copyModel = false;
-                              cutModel = false;
-                              Navigator.pop(context);
-                            }
-                          },
+                            Container(
+                              width: 170,
+                              child: Card(
+                                margin: EdgeInsets.only(
+                                    left: 5, right: 5, bottom: 20),
+                                child: InkWell(
+                                  child: Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('取消',
+                                          style: TextStyle(
+                                              color: Colors.cyanAccent)),
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    copyModel = false;
+                                    copyTempFile = null; //取消复制模式
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      : Container(
+                          width: 0,
                         ),
-                      ),
-                    ),
-                    Container(
-                      width: 170,
-                      child: Card(
-                        margin: EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                        child: InkWell(
-                          child: Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Text('取消',
-                                  style: TextStyle(color: Colors.cyanAccent)),
-                            ),
-                          ),
-                          onTap: () {
-                            copyModel = false;
-                            copyTempFile = null; //取消复制模式
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                    )
-                  ],
-                )
-              : Container(
-                  width: 0,
-                );
+                  WidgetItem().returnFileOperateButton(context, cardColor,
+                      (file, type) => null, '新建文件', null, null)
+                ],
+              ),
+            ),
+          );
         });
   }
 
   //复制文件到
-  void copyToDir(FileSystemEntity file) {
+  void copyToDir(FileSystemEntity file, int type) {
     cutModel = false;
     copyModel = true;
     copyTempFile = file;
   }
 
   //剪切文件到
-  void cutToDir(FileSystemEntity file) {
+  void cutToDir(FileSystemEntity file, int type) {
     copyModel = false;
     cutModel = true;
     copyTempFile = file;
@@ -649,7 +514,7 @@ class _MyHomePageState extends State<MyHome> {
   }
 
   //添加到favorite
-  void addToFavorite(FileSystemEntity file) {
+  void addToFavorite(FileSystemEntity file, int type) {
     bool flag = isInFavorite(file.path);
     if (!flag) {
       try {
@@ -687,7 +552,7 @@ class _MyHomePageState extends State<MyHome> {
   }
 
   //从favorite中移除
-  void removeFavorite(FileSystemEntity file) {
+  void removeFavorite(FileSystemEntity file, int type) {
     bool flag = isInFavorite(file.path);
     setState(() {
       if (flag) {
@@ -748,6 +613,7 @@ class _MyHomePageState extends State<MyHome> {
                   style: TextStyle(color: Colors.blue),
                 ),
                 onPressed: () {
+                  String temp = file.parent.path;
                   if (file.statSync().type == FileSystemEntityType.directory) {
                     Directory directory = Directory(file.path);
                     directory.deleteSync(recursive: true);
@@ -758,7 +624,9 @@ class _MyHomePageState extends State<MyHome> {
                   //TODO
                   if (type == -1) {
                     //删除了左边的文件
-                    initPathFiles(parentDir.path, -3);
+                    setState(() {
+                      sortFile(Directory(temp), 1);
+                    });
                   } else if (type == 1) {
                     //删除了右边的文件
                     initPathFiles(parentDir.path, -1);

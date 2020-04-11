@@ -83,9 +83,13 @@ flutter:
     - assets/images/image.png
     - assets/images/mp3.png
     - assets/images/ppt.png
+    - assets/images/pdf.png
     - assets/images/psd.png
     - assets/images/txt.png
     - assets/images/unknown.png
     - assets/images/video.png
     - assets/images/word.png
     - assets/images/zip.png
+    - assets/images/audio.png
+    - assets/images/mp4.png
+    - assets/images/xml.png
