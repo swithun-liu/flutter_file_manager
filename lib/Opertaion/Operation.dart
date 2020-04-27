@@ -15,8 +15,46 @@ class Operation {
   ValueNotifier<bool> uiShouldChange;
   Mode mode;
 
-  Operation(
-      this.leftFiles, this.rightFiles, this.context,{ this.uiShouldChange,this.mode});
+  Operation(this.leftFiles, this.rightFiles, this.context,
+      {this.uiShouldChange, this.mode});
+
+  //添加到favorite
+  void addToFavorite(FileSystemEntity file, int type) {
+    bool flag = isInFavorite(file.path);
+    if (!flag) {
+      try {
+        File favoriteTxt = File(Common().favoriteDir + '/favorite.txt');
+        favoriteTxt.copy(Common().sDCardDir + '/1/test.txt');
+        if (Common().favoriteAll.length > 0) {
+          Common().favoriteAll =
+              Common().favoriteAll + '\n' + file.path.toString();
+        } else {
+          Common().favoriteAll = Common().favoriteAll + file.path.toString();
+        }
+        Common().favoriteFileList.add(file.path.toString());
+        favoriteTxt.writeAsStringSync(Common().favoriteAll);
+        print('收藏' + file.path);
+      } catch (err) {
+        print('错误信息' + err.toString());
+      }
+    }
+    showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text(flag ? '条目已存在' : '添加成功'),
+            actions: <Widget>[
+              CupertinoDialogAction(
+                child: Text('确定'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+          Navigator.pop(context);
+        });
+  }
 
   //重命名文件
   void renameFile(FileSystemEntity file, int type) {
@@ -139,13 +177,13 @@ class Operation {
     changeUI();
   }
 
-  void changeUI(){
-    if(uiShouldChange==null){
+  void changeUI() {
+    if (uiShouldChange == null) {
       print('uiShouldChange is null');
     }
-    if(uiShouldChange.value){
-      uiShouldChange.value=false;
-    }else{
+    if (uiShouldChange.value) {
+      uiShouldChange.value = false;
+    } else {
       uiShouldChange.value = true;
     }
   }
@@ -221,31 +259,33 @@ class Operation {
     mode.copyMode = true;
     mode.copyTempFile = file;
   }
+
   //剪切文件到
   void cutToDir(FileSystemEntity file, int type) {
     mode.copyMode = false;
     mode.cutMode = true;
     mode.copyTempFile = file;
   }
+
   //从favorite中移除
   void removeFavorite(FileSystemEntity file, int type) {
     bool flag = isInFavorite(file.path);
-      if (flag) {
-        //如果要取消收藏的文件在favorite条目中存在
-        int i = 0;
-        //从Common中的喜爱条目中删除它
-        for (var item in Common().favoriteFileList) {
-          print(i.toString() + '  ' + item.toString());
-          if (item.toString() == file.path) {
-            Common().favoriteFileList.removeAt(i);
-            break;
-          }
-          i++;
+    if (flag) {
+      //如果要取消收藏的文件在favorite条目中存在
+      int i = 0;
+      //从Common中的喜爱条目中删除它
+      for (var item in Common().favoriteFileList) {
+        print(i.toString() + '  ' + item.toString());
+        if (item.toString() == file.path) {
+          Common().favoriteFileList.removeAt(i);
+          break;
         }
-        //将更新后的喜爱条目写回文件
-        writeIntoLocal();
-        changeUI();
+        i++;
       }
+      //将更新后的喜爱条目写回文件
+      writeIntoLocal();
+      changeUI();
+    }
     showCupertinoDialog(
         context: context,
         builder: (BuildContext context) {
@@ -263,6 +303,7 @@ class Operation {
           Navigator.pop(context);
         });
   }
+
   //删除文件
   void deleteFile(FileSystemEntity file, int type) {
     showCupertinoDialog(
@@ -298,7 +339,7 @@ class Operation {
                   //TODO
                   if (type == -1) {
                     //删除了左边的文件
-                      sortFile(Directory(temp), 1);
+                    sortFile(Directory(temp), 1);
                   } else if (type == 1) {
                     //删除了右边的文件
                     initPathFiles(mode.parentDir.path, -1);

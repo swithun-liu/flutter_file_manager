@@ -234,15 +234,8 @@ class _MyHomePageState extends State<MyHome> {
                           .returnButton(),
                       new RemoveFavOperation(context, file, type)
                           .returnButton(),
-                      new DeleteOperationButton(
-                              context,
-                              file,
-                              type,
-                              mode,
-                              leftFiles,
-                              rightFiles,
-                              mode.parentDir,
-                              uiShouldChange)
+                      new DeleteOperationButton(context, file, type, leftFiles,
+                              rightFiles, mode, uiShouldChange)
                           .returnButton(),
                     ],
                   ));
@@ -324,15 +317,8 @@ class _MyHomePageState extends State<MyHome> {
                             .returnButton(),
                         new RemoveFavOperation(context, file, type)
                             .returnButton(),
-                        new DeleteOperationButton(
-                                context,
-                                file,
-                                type,
-                                mode,
-                                leftFiles,
-                                rightFiles,
-                                mode.parentDir,
-                                uiShouldChange)
+                        new DeleteOperationButton(context, file, type,
+                                leftFiles, rightFiles, mode, uiShouldChange)
                             .returnButton(),
                       ],
                     ),
