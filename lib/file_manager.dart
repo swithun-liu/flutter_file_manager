@@ -7,11 +7,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:neofilemanager/widgetItem.dart';
+import 'package:neofilemanager/OperationButtom/CutOperationButton.dart';
+import 'package:neofilemanager/OperationButtom/DeleteOperationButton.dart';
+import 'package:neofilemanager/Opertaion/Operation.dart';
+import 'file:///D:/a-Projects/AndroidStudioProjects/FLUTTER/neo_file_manager/lib/Item/widgetItem.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
-
-import 'Common.dart';
+import 'Item/Common.dart';
+import 'Item/Mode.dart';
+import 'OperationButtom/AddToFavOperationButton.dart';
+import 'OperationButtom/CopyOperationButton.dart';
+import 'OperationButtom/RemoveFavOperationButton.dart';
+import 'OperationButtom/RenameOperationButton.dart';
 
 class MyHome extends StatefulWidget {
   MyHome({Key key, this.title}) : super(key: key);
@@ -23,44 +30,27 @@ class MyHome extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHome> {
+  ValueNotifier<bool> uiShouldChange = ValueNotifier<bool>(false);
+
   List<FileSystemEntity> leftFiles = []; //左列的文件
   List<FileSystemEntity> rightFiles = []; //右列的文件
-
-//  bool favoriteModel = false;
-  bool cutModel = false; //是否点了剪切文件
-  bool copyModel = false; //是否点了复制文件
+  Mode mode = new Mode(false, false, null, null);
   int cardColor = 0x22ffffff;
-  double iconHight = 30.0;
+  double iconHeight = 30.0;
   double iconWidth = 30.0;
   double fileFontSize = 9.0;
   double subTitleFontSize = 6.0;
-  Directory parentDir; //父目录
   ScrollController controller = ScrollController();
   List<double> position = [];
-  FileSystemEntity copyTempFile = null;
 
   ///初始化: 拿到根路径 刷新目录
   @override
   void initState() {
     super.initState();
-    parentDir = Directory(Common().sDCardDir); //获取根路径
-    initPathFiles(Common().sDCardDir, -2); //刷新左列目录
-  }
-
-  ///用于导航返回拦截器的onWillPop
-  Future<bool> onWillPop() async {
-    if (parentDir.parent.path != Common().sDCardDir &&
-        parentDir.path != Common().sDCardDir) {
-      /// 如果不是根目录,就跳转到上层目录并刷新目录
-      initPathFiles(parentDir.path, 2);
-    } else {
-      ///否则退出
-      ///https://blog.csdn.net/weixin_33979203/article/details/88019065
-      ///Router: 路由 对屏幕界面的抽象 每一个页面都有相应的Page
-      print('退出时parentDir为:' + parentDir.path);
-      SystemNavigator.pop();
-    }
-    return false;
+    mode.parentDir = Directory(Common().sDCardDir); //获取根路径
+    new Operation(leftFiles, rightFiles, context,
+            uiShouldChange: uiShouldChange, mode: mode)
+        .initPathFiles(Common().sDCardDir, -2);
   }
 
   @override
@@ -71,14 +61,14 @@ class _MyHomePageState extends State<MyHome> {
         backgroundColor: Colors.black,
         appBar: AppBar(
           title: Text(
-            parentDir?.path == Common().sDCardDir
+            mode.parentDir?.path == Common().sDCardDir
                 ? 'SD card'
-                : p.basename(parentDir.path),
+                : p.basename(mode.parentDir.path),
           ),
           centerTitle: true,
           elevation: 5.0,
           //浮起来的高度
-          leading: parentDir?.path == Common().sDCardDir
+          leading: mode.parentDir?.path == Common().sDCardDir
               ? Container()
               : IconButton(
                   icon: Icon(
@@ -87,15 +77,20 @@ class _MyHomePageState extends State<MyHome> {
                   onPressed: onWillPop,
                 ), //再标题前面显示的一个控件
         ),
-        body: Row(
-          children: <Widget>[
-            Expanded(
-              child: _fileListView(leftFiles, -1),
-            ),
-            Expanded(
-              child: _fileListView(rightFiles, 1),
-            )
-          ],
+        body: ValueListenableBuilder(
+          valueListenable: uiShouldChange,
+          builder: (BuildContext context, bool value, Widget child) {
+            return Row(
+              children: <Widget>[
+                Expanded(
+                  child: _fileListView(leftFiles, -1),
+                ),
+                Expanded(
+                  child: _fileListView(rightFiles, 1),
+                ),
+              ],
+            );
+          },
         ),
         bottomNavigationBar: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,7 +108,9 @@ class _MyHomePageState extends State<MyHome> {
               child: CupertinoButton(
                 child: Icon(Icons.home),
                 onPressed: () {
-                  initPathFiles(Common().sDCardDir, -2); //刷新左列目录
+                  new Operation(leftFiles, rightFiles, context,
+                          uiShouldChange: uiShouldChange, mode: mode)
+                      .initPathFiles(Common().sDCardDir, -2);
                 },
               ),
             ),
@@ -137,6 +134,25 @@ class _MyHomePageState extends State<MyHome> {
         ),
       ),
     );
+  }
+
+  ///用于导航返回拦截器的onWillPop
+  Future<bool> onWillPop() async {
+    if (mode.parentDir.parent.path != Common().sDCardDir &&
+        mode.parentDir.path != Common().sDCardDir) {
+      /// 如果不是根目录,就跳转到上层目录并刷新目录
+//      initPathFiles(parentDir.path, 2);
+      new Operation(leftFiles, rightFiles, context,
+              uiShouldChange: uiShouldChange, mode: mode)
+          .initPathFiles(mode.parentDir.path, 2);
+    } else {
+      ///否则退出
+      ///https://blog.csdn.net/weixin_33979203/article/details/88019065
+      ///Router: 路由 对屏幕界面的抽象 每一个页面都有相应的Page
+      print('退出时parentDir为:' + mode.parentDir.path);
+      SystemNavigator.pop();
+    }
+    return false;
   }
 
   Widget _fileListView(List<FileSystemEntity> files, int type) {
@@ -175,7 +191,7 @@ class _MyHomePageState extends State<MyHome> {
         child: ListTile(
           leading: Image.asset(
             Common().selectIcon(p.extension(file.path)),
-            height: iconHight,
+            height: iconHeight,
             width: iconWidth,
           ),
           title: Text(file.path.substring(file.parent.path.length + 1),
@@ -207,18 +223,27 @@ class _MyHomePageState extends State<MyHome> {
                         ? CrossAxisAlignment.start
                         : CrossAxisAlignment.end,
                     children: <Widget>[
-                      WidgetItem().returnFileOperateButton(
-                          context, cardColor, renameFile, '重命名', file, type),
-                      WidgetItem().returnFileOperateButton(
-                          context, cardColor, copyToDir, '复制', file, type),
-                      WidgetItem().returnFileOperateButton(
-                          context, cardColor, cutToDir, '剪切', file, type),
-                      WidgetItem().returnFileOperateButton(
-                          context, cardColor, addToFavorite, '收藏', file, type),
-                      WidgetItem().returnFileOperateButton(context, cardColor,
-                          removeFavorite, '取消收藏', file, type),
-                      WidgetItem().returnFileOperateButton(
-                          context, cardColor, deleteFile, '删除', file, type),
+                      new RenameOperationButton(context, file, type, leftFiles,
+                              rightFiles, uiShouldChange, mode)
+                          .returnButton(),
+                      new CopyOperationButton(context, file, type, mode)
+                          .returnButton(),
+                      new CutOperationButton(context, file, type, mode)
+                          .returnButton(),
+                      new AddToOperationButton(context, file, type)
+                          .returnButton(),
+                      new RemoveFavOperation(context, file, type)
+                          .returnButton(),
+                      new DeleteOperationButton(
+                              context,
+                              file,
+                              type,
+                              mode,
+                              leftFiles,
+                              rightFiles,
+                              mode.parentDir,
+                              uiShouldChange)
+                          .returnButton(),
                     ],
                   ));
             });
@@ -234,18 +259,18 @@ class _MyHomePageState extends State<MyHome> {
     return Card(
       color: Color(0xff111111),
       elevation: 15.0,
-      margin: EdgeInsets.only(left: 5,right: 5,bottom: 5,top: 5),
+      margin: EdgeInsets.only(left: 5, right: 5, bottom: 5, top: 5),
       child: InkWell(
         child: Container(
           decoration: BoxDecoration(
 //            color: Colors.black,
 //            border:
 //                Border(bottom: BorderSide(width: 0.5, color: Colors.white)),
-          ),
+              ),
           child: ListTile(
               leading: Image.asset(
                 'assets/images/folder.png',
-                height: iconHight,
+                height: iconHeight,
                 width: iconWidth,
               ),
               title: Row(
@@ -270,7 +295,10 @@ class _MyHomePageState extends State<MyHome> {
               ),
         ),
         onTap: () {
-          initPathFiles(file.path, type);
+//          initPathFiles(file.path, type);
+          new Operation(leftFiles, rightFiles, context,
+                  uiShouldChange: uiShouldChange, mode: mode)
+              .initPathFiles(file.path, type);
         },
         onLongPress: () {
           showModalBottomSheet(
@@ -289,14 +317,23 @@ class _MyHomePageState extends State<MyHome> {
                           ? CrossAxisAlignment.start
                           : CrossAxisAlignment.end,
                       children: <Widget>[
-                        WidgetItem().returnFileOperateButton(
-                            context, cardColor, renameFile, '重命名', file, type),
-                        WidgetItem().returnFileOperateButton(context, cardColor,
-                            addToFavorite, '收藏', file, type),
-                        WidgetItem().returnFileOperateButton(context, cardColor,
-                            removeFavorite, '取消收藏', file, type),
-                        WidgetItem().returnFileOperateButton(
-                            context, cardColor, deleteFile, '删除', file, type),
+                        new RenameOperationButton(context, file, type,
+                                leftFiles, rightFiles, uiShouldChange, mode)
+                            .returnButton(),
+                        new AddToOperationButton(context, file, type)
+                            .returnButton(),
+                        new RemoveFavOperation(context, file, type)
+                            .returnButton(),
+                        new DeleteOperationButton(
+                                context,
+                                file,
+                                type,
+                                mode,
+                                leftFiles,
+                                rightFiles,
+                                mode.parentDir,
+                                uiShouldChange)
+                            .returnButton(),
                       ],
                     ),
                   ),
@@ -305,7 +342,6 @@ class _MyHomePageState extends State<MyHome> {
         },
       ),
     );
-
   }
 
   Widget returnFileOperateButton(int cardColor,
@@ -351,9 +387,9 @@ class _MyHomePageState extends State<MyHome> {
   void moreAction(int side) {
     String destinationDir = '';
     if (side == -1) {
-      destinationDir = parentDir.parent.path;
+      destinationDir = mode.parentDir.parent.path;
     } else {
-      destinationDir = parentDir.path;
+      destinationDir = mode.parentDir.path;
     }
     showModalBottomSheet(
         backgroundColor: Color(0x00000000),
@@ -371,7 +407,7 @@ class _MyHomePageState extends State<MyHome> {
                     ? CrossAxisAlignment.start
                     : CrossAxisAlignment.end,
                 children: <Widget>[
-                  copyModel | cutModel
+                  mode.copyMode | mode.cutMode
                       ? Column(
                           children: <Widget>[
                             Container(
@@ -388,28 +424,42 @@ class _MyHomePageState extends State<MyHome> {
                                     ),
                                   ),
                                   onTap: () {
-                                    if (copyTempFile.statSync().type ==
+                                    print('copyTempFile-->file_manager:' +
+                                        mode.copyTempFile.path.toString());
+                                    if (mode.copyTempFile.statSync().type ==
                                         FileSystemEntityType.file) {
-                                      String path = copyTempFile.path;
-                                      File temp = copyTempFile;
+                                      String path = mode.copyTempFile.path;
+                                      File temp = mode.copyTempFile;
                                       print('剪切的文件 ' + temp.path);
                                       temp.copy(destinationDir +
                                           '/' +
                                           temp.path.substring(
                                               temp.parent.path.length + 1));
-                                      copyTempFile = null; //复制之后取消复制模式
-                                      if (cutModel) {
+                                      mode.copyTempFile = null; //复制之后取消复制模式
+                                      if (mode.cutMode) {
                                         temp = File(path);
                                         temp.delete();
                                         print('删除' + temp.path);
                                       }
                                       if (side == -1) {
-                                        initPathFiles(parentDir.path, -3);
+//                                        initPathFiles(parentDir.path, -3);
+                                        new Operation(
+                                                leftFiles, rightFiles, context,
+                                                uiShouldChange: uiShouldChange,
+                                                mode: mode)
+                                            .initPathFiles(
+                                                mode.parentDir.path, -3);
                                       } else {
-                                        initPathFiles(parentDir.path, -3);
+//                                        initPathFiles(parentDir.path, -3);
+                                        new Operation(
+                                                leftFiles, rightFiles, context,
+                                                uiShouldChange: uiShouldChange,
+                                                mode: mode)
+                                            .initPathFiles(
+                                                mode.parentDir.path, -3);
                                       }
-                                      copyModel = false;
-                                      cutModel = false;
+                                      mode.copyMode = false;
+                                      mode.cutMode = false;
                                       Navigator.pop(context);
                                     }
                                   },
@@ -431,8 +481,8 @@ class _MyHomePageState extends State<MyHome> {
                                     ),
                                   ),
                                   onTap: () {
-                                    copyModel = false;
-                                    copyTempFile = null; //取消复制模式
+                                    mode.copyMode = false;
+                                    mode.copyTempFile = null; //取消复制模式
                                     Navigator.pop(context);
                                   },
                                 ),
@@ -452,53 +502,6 @@ class _MyHomePageState extends State<MyHome> {
         });
   }
 
-  //复制文件到
-  void copyToDir(FileSystemEntity file, int type) {
-    cutModel = false;
-    copyModel = true;
-    copyTempFile = file;
-  }
-
-  //剪切文件到
-  void cutToDir(FileSystemEntity file, int type) {
-    copyModel = false;
-    cutModel = true;
-    copyTempFile = file;
-  }
-
-  //将更新后的喜爱条目写回文件
-  void writeIntoLocal() {
-    String temp = '';
-    int i = 0;
-    for (var item in Common().favoriteFileList) {
-      print('写入' + item);
-      if (i == 0) {
-        temp = item.toString();
-      } else {
-        temp = temp + '\n' + item.toString();
-      }
-      i++;
-    }
-    Common().favoriteAll = temp;
-    try {
-      File favoriteTxt = File(Common().favoriteDir + '/favorite.txt');
-      favoriteTxt.writeAsStringSync(Common().favoriteAll);
-    } catch (err) {
-      print('错误信息' + err.toString());
-    }
-  }
-
-  //文件是否在favorite中
-  bool isInFavorite(String filePath) {
-    bool flag = false;
-    for (var fileItem in Common().favoriteFileList) {
-      if (fileItem == filePath) {
-        flag = true;
-      }
-    }
-    return flag;
-  }
-
   //切换favorite
   void listFavorite() {
     setState(() {
@@ -511,297 +514,5 @@ class _MyHomePageState extends State<MyHome> {
         }
       }
     });
-  }
-
-  //添加到favorite
-  void addToFavorite(FileSystemEntity file, int type) {
-    bool flag = isInFavorite(file.path);
-    if (!flag) {
-      try {
-        File favoriteTxt = File(Common().favoriteDir + '/favorite.txt');
-        favoriteTxt.copy(Common().sDCardDir + '/1/test.txt');
-        if (Common().favoriteAll.length > 0) {
-          Common().favoriteAll =
-              Common().favoriteAll + '\n' + file.path.toString();
-        } else {
-          Common().favoriteAll = Common().favoriteAll + file.path.toString();
-        }
-        Common().favoriteFileList.add(file.path.toString());
-        favoriteTxt.writeAsStringSync(Common().favoriteAll);
-        print('收藏' + file.path);
-      } catch (err) {
-        print('错误信息' + err.toString());
-      }
-    }
-    showCupertinoDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Text(flag ? '条目已存在' : '添加成功'),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                child: Text('确定'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          );
-          Navigator.pop(context);
-        });
-  }
-
-  //从favorite中移除
-  void removeFavorite(FileSystemEntity file, int type) {
-    bool flag = isInFavorite(file.path);
-    setState(() {
-      if (flag) {
-        //如果要取消收藏的文件在favorite条目中存在
-        int i = 0;
-        //从Common中的喜爱条目中删除它
-        for (var item in Common().favoriteFileList) {
-          print(i.toString() + '  ' + item.toString());
-          if (item.toString() == file.path) {
-            Common().favoriteFileList.removeAt(i);
-            break;
-          }
-          i++;
-        }
-        //将更新后的喜爱条目写回文件
-        writeIntoLocal();
-      }
-    });
-    showCupertinoDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Text(flag ? '已取消收藏' : '取消收藏失败'),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                child: Text('确定'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          );
-          Navigator.pop(context);
-        });
-  }
-
-  //删除文件
-  void deleteFile(FileSystemEntity file, int type) {
-    showCupertinoDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Text('重命名'),
-            content: Text('删除后不可恢复'),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                child: Text(
-                  '取消',
-                  style: TextStyle(color: Colors.blue),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              CupertinoDialogAction(
-                child: Text(
-                  '确定',
-                  style: TextStyle(color: Colors.blue),
-                ),
-                onPressed: () {
-                  String temp = file.parent.path;
-                  if (file.statSync().type == FileSystemEntityType.directory) {
-                    Directory directory = Directory(file.path);
-                    directory.deleteSync(recursive: true);
-                  } else if (file.statSync().type ==
-                      FileSystemEntityType.file) {
-                    file.deleteSync();
-                  }
-                  //TODO
-                  if (type == -1) {
-                    //删除了左边的文件
-                    setState(() {
-                      sortFile(Directory(temp), 1);
-                    });
-                  } else if (type == 1) {
-                    //删除了右边的文件
-                    initPathFiles(parentDir.path, -1);
-                  }
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          );
-        });
-  }
-
-  //重命名文件
-  void renameFile(FileSystemEntity file, int type) {
-    TextEditingController _controller = TextEditingController();
-
-    showCupertinoDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Center(
-              child: CupertinoAlertDialog(
-                title: Text('重命名'),
-                content: Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: '请输入新名称',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(width: 0.3)),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(width: 0.5)),
-                      contentPadding: EdgeInsets.all(8.0),
-                    ),
-                  ),
-                ),
-                actions: <Widget>[
-                  CupertinoButton(
-                    child: Text(
-                      '取消',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  CupertinoButton(
-                    child: Text(
-                      '确认',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    onPressed: () async {
-                      String newName = _controller.text;
-                      if (newName.trim().length == 0) {
-                        Fluttertoast.showToast(
-                            msg: '名字不能为空', gravity: ToastGravity.BOTTOM);
-                        return;
-                      }
-                      String newPath = "";
-                      if (file.statSync().type == FileSystemEntityType.file) {
-                        newPath = file.parent.path +
-                            '/' +
-                            newName +
-                            p.extension(file.path);
-                      } else {
-                        newPath = file.parent.path + '/' + newName;
-                      }
-                      file.renameSync(newPath);
-                      if (type == -1) {
-                        initPathFiles(newPath, -3);
-                      } else {
-                        initPathFiles(file.parent.path, type);
-                      }
-                      Navigator.pop(context);
-                    },
-                  )
-                ],
-              ),
-            ),
-          );
-        });
-  }
-
-  //用传来的路径刷新该目录下的文件.文件夹
-  void initPathFiles(String path, int type) {
-    try {
-      //可变的Widget可以使用setState()函数--重新绘制试图--调用build方法--绘制不一样的地方
-      //-1: 右列-->父目录下  (点了左边列表,刷新右边列表,parentDir时左边的)
-      // 1: 右列-->父目录下  (点了右列的文件夹的情况,parenDir换成了右边的)
-      //    左列-->父目录同级
-      //-2: 左列-->当前父目录下 (初始化时,用sdcard刷线左列)
-      // 2: 右列-->父目录同级   (按了返回键)
-      //    左列-->父目录的父目录同级
-      //-3: 左列-->父目录同级  (原地刷新)
-      //    右列-->父目录下
-      setState(() {
-        parentDir = Directory(path);
-        print('parentDir 更改为' + parentDir.path);
-        if (type == -1) {
-          //点击左列
-          //刷新右列表
-          sortFile(parentDir, -1);
-        } else if (type == 1) {
-          //点击右列
-          //往右走 先刷右列表 再刷左列表
-          sortFile(parentDir, -1);
-          sortFile(parentDir.parent, 1);
-        } else if (type == -2) {
-          //初始化
-          sortFile(parentDir, 1);
-        } else if (type == 2) {
-          //返回时
-          sortFile(parentDir.parent, -1);
-          sortFile(parentDir.parent.parent, 1);
-          parentDir = parentDir.parent;
-        } else if (type == -3) {
-          //左列重命名文件夹
-          sortFile(parentDir.parent, 1);
-          sortFile(parentDir, -1);
-        }
-      });
-    } catch (e) {
-      print(e);
-      print("Directory does not exist");
-    }
-  }
-
-  //目录排序
-  void sortFile(Directory parentDir, int type) {
-    List<FileSystemEntity> _Files = [];
-    List<FileSystemEntity> _Folders = [];
-    //parenDire--路径
-    //Directory.listSync 会列出当前目录下所有的文件和文件夹
-    for (var v in parentDir.listSync()) {
-      //去除.开头的文件/文件夹
-      if (p.basename(v.path).substring(0, 1) == '.') {
-        continue;
-      }
-      if (FileSystemEntity.isFileSync(v.path))
-        _Files.add(v);
-      else
-        _Folders.add(v);
-    }
-    _Files.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-    _Folders.sort(
-        (a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-    if (type == -1) {
-      //刷新右列
-      rightFiles.clear();
-      rightFiles.addAll(_Folders);
-      rightFiles.addAll(_Files);
-    } else {
-      //刷新左列
-      leftFiles.clear();
-      leftFiles.addAll(_Folders);
-      leftFiles.addAll(_Files);
-    }
-  }
-
-  //目录跳转
-  void jumpToPosition(bool isEnter) async {
-    if (isEnter) {
-      controller.jumpTo(0.0);
-    } else {
-      try {
-        await Future.delayed(Duration(milliseconds: 1));
-        // "?" 的作用: 标示对象可以是 null
-        controller?.jumpTo(position[position.length - 1]);
-      } catch (e) {
-        position.removeLast();
-      }
-    }
   }
 }
