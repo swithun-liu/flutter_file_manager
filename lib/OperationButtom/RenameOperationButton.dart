@@ -12,7 +12,7 @@ class RenameOperationButton extends IOptButton {
   @override
   Color color = Colors.blue;
   @override
-  String titleText = '重命名2';
+  String titleText = '重命名';
 
   RenameOperationButton(
       BuildContext context,

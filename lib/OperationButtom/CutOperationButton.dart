@@ -14,7 +14,7 @@ class CutOperationButton extends IOptButton {
   @override
   Color color = Colors.lightBlue;
   @override
-  String titleText = '剪切2';
+  String titleText = '剪切';
 
   CutOperationButton(
       BuildContext context, FileSystemEntity file, int type, Mode mode)

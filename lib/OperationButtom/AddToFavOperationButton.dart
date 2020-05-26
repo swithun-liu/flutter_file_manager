@@ -14,7 +14,7 @@ class AddToOperationButton extends IOptButton {
   Color color = Colors.cyan;
 
   @override
-  String titleText = '收藏2';
+  String titleText = '收藏';
 
   AddToOperationButton(BuildContext context, FileSystemEntity file, int type)
       : super(context, file, type);

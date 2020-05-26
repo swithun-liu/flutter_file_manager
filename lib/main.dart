@@ -13,12 +13,14 @@ void main() {
   //future: Future<T>对象--Dart内置,有自己的队列策略(EventQueue)
   //async: 异步,不阻塞当前进程,来等待该线程处理完任务再执行其他任务
   //await: 等待,声明运算为延迟进行
+  Common common=new Common();
   Future<void> getSDCardDir() async {
     //插件path_provider提供函数getExternalStorageDirectory
     //获取SD卡根路径  path_provider提供方法
 //    Common().sDCardDir = (await getExternalStorageDirectory()).path;
-    Common().sDCardDir = '/storage/emulated/0';
-    Common().favoriteDir=(await getExternalStorageDirectory()).path;
+
+    common.sDCardDir = '/storage/emulated/0';
+    common.favoriteDir=(await getExternalStorageDirectory()).path;
 
     try{
       File favoriteTxt=File(Common().favoriteDir+'/favorite.txt');

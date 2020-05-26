@@ -10,7 +10,7 @@ class RemoveFavOperation extends IOptButton{
   @override
   Color color=Colors.cyanAccent;
   @override
-  String titleText='取消收藏2';
+  String titleText='取消收藏';
 
   RemoveFavOperation(BuildContext context, FileSystemEntity file, int type) : super(context, file, type);
 

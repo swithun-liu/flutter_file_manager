@@ -14,7 +14,7 @@ class DeleteOperationButton extends IOptButton {
   @override
   Color color = Colors.blueGrey;
   @override
-  String titleText = '删除2';
+  String titleText = '删除';
 
   Mode mode;
 

@@ -13,7 +13,7 @@ class CopyOperationButton extends IOptButton {
   @override
   Color color = Colors.blueAccent;
   @override
-  String titleText = '复制2';
+  String titleText = '复制';
 
   CopyOperationButton(
       BuildContext context, FileSystemEntity file, int type, Mode mode)

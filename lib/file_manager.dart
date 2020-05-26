@@ -5,16 +5,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:neofilemanager/Item/Preview/FilePre.dart';
+import 'package:neofilemanager/Item/Preview/Impl/ProxyFilePre.dart';
+import 'package:neofilemanager/Item/Preview/Impl/RealFilePre.dart';
 import 'package:neofilemanager/OperationButtom/CutOperationButton.dart';
 import 'package:neofilemanager/OperationButtom/DeleteOperationButton.dart';
 import 'package:neofilemanager/Opertaion/Operation.dart';
-import 'file:///D:/a-Projects/AndroidStudioProjects/FLUTTER/neo_file_manager/lib/Item/widgetItem.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
 import 'Item/Common.dart';
 import 'Item/Mode.dart';
+import 'Item/widgetItem.dart';
 import 'OperationButtom/AddToFavOperationButton.dart';
 import 'OperationButtom/CopyOperationButton.dart';
 import 'OperationButtom/RemoveFavOperationButton.dart';
@@ -42,15 +44,16 @@ class _MyHomePageState extends State<MyHome> {
   double subTitleFontSize = 6.0;
   ScrollController controller = ScrollController();
   List<double> position = [];
+  Common common = new Common();
 
   ///初始化: 拿到根路径 刷新目录
   @override
   void initState() {
     super.initState();
-    mode.parentDir = Directory(Common().sDCardDir); //获取根路径
+    mode.parentDir = Directory(common.sDCardDir); //获取根路径
     new Operation(leftFiles, rightFiles, context,
             uiShouldChange: uiShouldChange, mode: mode)
-        .initPathFiles(Common().sDCardDir, -2);
+        .initPathFiles(common.sDCardDir, -2);
   }
 
   @override
@@ -61,14 +64,14 @@ class _MyHomePageState extends State<MyHome> {
         backgroundColor: Colors.black,
         appBar: AppBar(
           title: Text(
-            mode.parentDir?.path == Common().sDCardDir
+            mode.parentDir?.path == common.sDCardDir
                 ? 'SD card'
                 : p.basename(mode.parentDir.path),
           ),
           centerTitle: true,
           elevation: 5.0,
           //浮起来的高度
-          leading: mode.parentDir?.path == Common().sDCardDir
+          leading: mode.parentDir?.path == common.sDCardDir
               ? Container()
               : IconButton(
                   icon: Icon(
@@ -77,69 +80,77 @@ class _MyHomePageState extends State<MyHome> {
                   onPressed: onWillPop,
                 ), //再标题前面显示的一个控件
         ),
-        body: ValueListenableBuilder(
-          valueListenable: uiShouldChange,
-          builder: (BuildContext context, bool value, Widget child) {
-            return Row(
-              children: <Widget>[
-                Expanded(
-                  child: _fileListView(leftFiles, -1),
-                ),
-                Expanded(
-                  child: _fileListView(rightFiles, 1),
-                ),
-              ],
-            );
-          },
-        ),
-        bottomNavigationBar: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
+        body: returnBody(),
+        bottomNavigationBar: returnBottomBar(),
+      ),
+    );
+  }
+
+  Widget returnBody() {
+    return ValueListenableBuilder(
+      valueListenable: uiShouldChange,
+      builder: (BuildContext context, bool value, Widget child) {
+        return Row(
           children: <Widget>[
             Expanded(
-              child: CupertinoButton(
-                child: Icon(Icons.add),
-                onPressed: () {
-                  moreAction(-1);
-                },
-              ),
+              child: _fileListView(leftFiles, -1),
             ),
             Expanded(
-              child: CupertinoButton(
-                child: Icon(Icons.home),
-                onPressed: () {
-                  new Operation(leftFiles, rightFiles, context,
-                          uiShouldChange: uiShouldChange, mode: mode)
-                      .initPathFiles(Common().sDCardDir, -2);
-                },
-              ),
-            ),
-            Expanded(
-              child: CupertinoButton(
-                child: Icon(Icons.favorite),
-                onPressed: () {
-                  listFavorite();
-                },
-              ),
-            ),
-            Expanded(
-              child: CupertinoButton(
-                child: Icon(Icons.add),
-                onPressed: () {
-                  moreAction(1);
-                },
-              ),
+              child: _fileListView(rightFiles, 1),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  Widget returnBottomBar() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Expanded(
+          child: CupertinoButton(
+            child: Icon(Icons.add),
+            onPressed: () {
+              moreAction(-1);
+            },
+          ),
         ),
-      ),
+        Expanded(
+          child: CupertinoButton(
+            child: Icon(Icons.home),
+            onPressed: () {
+              new Operation(leftFiles, rightFiles, context,
+                      uiShouldChange: uiShouldChange, mode: mode)
+                  .initPathFiles(common.sDCardDir, -2);
+            },
+          ),
+        ),
+        Expanded(
+          child: CupertinoButton(
+            child: Icon(Icons.favorite),
+            onPressed: () {
+              listFavorite();
+            },
+          ),
+        ),
+        Expanded(
+          child: CupertinoButton(
+            child: Icon(Icons.add),
+            onPressed: () {
+              moreAction(1);
+            },
+          ),
+        ),
+      ],
     );
   }
 
   ///用于导航返回拦截器的onWillPop
   Future<bool> onWillPop() async {
-    if (mode.parentDir.parent.path != Common().sDCardDir &&
-        mode.parentDir.path != Common().sDCardDir) {
+    if (mode.parentDir.parent.path != common.sDCardDir &&
+        mode.parentDir.path != common.sDCardDir) {
       /// 如果不是根目录,就跳转到上层目录并刷新目录
 //      initPathFiles(parentDir.path, 2);
       new Operation(leftFiles, rightFiles, context,
@@ -180,6 +191,12 @@ class _MyHomePageState extends State<MyHome> {
     //获取文件最后改动日期
     String modifiledTime = DateFormat('yyyy-MM-dd HH:mm:ss', 'zh_CN')
         .format(file.statSync().modified.toLocal());
+    FilePre fileIcon;
+
+    fileIcon = ProxyFilePre(common, file, p.extension(file.path));
+    // print('走着1');
+
+      // fileIcon = RealFilePre(common, file, p.extension(file.path));
 
     ///InkWell: 水波纹效果
     return InkWell(
@@ -189,17 +206,14 @@ class _MyHomePageState extends State<MyHome> {
           border: Border(bottom: BorderSide(width: 0.5, color: Colors.black12)),
         ),
         child: ListTile(
-          leading: Image.asset(
-            Common().selectIcon(p.extension(file.path)),
-            height: iconHeight,
-            width: iconWidth,
-          ),
+          // leading: ProxyFilePre(common, file, p.extension(file.path)),
+          leading: fileIcon,
           title: Text(file.path.substring(file.parent.path.length + 1),
               style: TextStyle(fontSize: fileFontSize)),
 
           ///从文件路径中截取文件名字 (file.parent.length+1-文件父目录长度)
           subtitle: Text(
-            '$modifiledTime ${Common().getFileSize(file.statSync().size)}',
+            '$modifiledTime ${common.getFileSize(file.statSync().size)}',
             style: TextStyle(fontSize: subTitleFontSize),
           ), //时间和文件大小
         ),
@@ -493,8 +507,8 @@ class _MyHomePageState extends State<MyHome> {
     setState(() {
       leftFiles.clear();
       rightFiles.clear();
-      if (Common().favoriteFileList != null) {
-        for (var fileItem in Common().favoriteFileList) {
+      if (common.favoriteFileList != null) {
+        for (var fileItem in common.favoriteFileList) {
           print(fileItem);
           leftFiles.add(new File(fileItem));
         }
