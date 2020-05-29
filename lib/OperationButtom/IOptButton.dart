@@ -23,6 +23,7 @@ abstract class IOptButton implements IOptButtonBusiness {
     return Container(
       width: 170,
       child: Card(
+        elevation: 0,
         color: Color(cardColor),
         margin: EdgeInsets.only(left: 5, right: 5, bottom: 20),
         child: InkWell(

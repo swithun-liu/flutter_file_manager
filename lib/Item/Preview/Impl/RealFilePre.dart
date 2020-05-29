@@ -13,10 +13,10 @@ class RealFilePre extends FilePre {
   double fileHeight = 50.0;
   double fileWidth = 70.0;
 
-  RealFilePre(this.common, this.file, this.extension);
+  RealFilePre(this.common, this.file, this.extension,this.fileHeight,this.fileWidth);
 
   Widget build(BuildContext context) {
-    if (extension == '.png' || extension == '.jpg' || extension == '.jpeg') {
+    if (extension == '.png' || extension == '.jpg' || extension == '.jpeg'||extension=='.gif') {
       print('RealFilePre创建图片');
       return ClipRRect(
         borderRadius: BorderRadius.circular(10),

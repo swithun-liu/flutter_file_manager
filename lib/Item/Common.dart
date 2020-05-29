@@ -75,6 +75,9 @@ class Common{
       case '.psd':
         iconImg = 'assets/images/psd.png';
         break;
+      case '.apk':
+        iconImg='assets/images/apk.png';
+        break;
       default:
         iconImg = 'assets/images/file.png';
         break;

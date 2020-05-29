@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:neofilemanager/Item/Preview/FilePre.dart';
 import 'package:neofilemanager/Item/Preview/Impl/ProxyFilePre.dart';
-import 'package:neofilemanager/Item/Preview/Impl/RealFilePre.dart';
+import 'package:neofilemanager/Item/Preview/Impl/TxtFilePre.dart';
 import 'package:neofilemanager/OperationButtom/CutOperationButton.dart';
 import 'package:neofilemanager/OperationButtom/DeleteOperationButton.dart';
 import 'package:neofilemanager/Opertaion/Operation.dart';
@@ -58,92 +58,95 @@ class _MyHomePageState extends State<MyHome> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: onWillPop,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          title: Text(
-            mode.parentDir?.path == common.sDCardDir
-                ? 'SD card'
-                : p.basename(mode.parentDir.path),
-          ),
-          centerTitle: true,
-          elevation: 5.0,
-          //浮起来的高度
-          leading: mode.parentDir?.path == common.sDCardDir
-              ? Container()
-              : IconButton(
-                  icon: Icon(
-                    Icons.arrow_left,
-                  ),
-                  onPressed: onWillPop,
-                ), //再标题前面显示的一个控件
-        ),
-        body: returnBody(),
-        bottomNavigationBar: returnBottomBar(),
-      ),
-    );
-  }
-
-  Widget returnBody() {
     return ValueListenableBuilder(
       valueListenable: uiShouldChange,
       builder: (BuildContext context, bool value, Widget child) {
-        return Row(
-          children: <Widget>[
-            Expanded(
-              child: _fileListView(leftFiles, -1),
+        return WillPopScope(
+          onWillPop: onWillPop,
+          child: Scaffold(
+            backgroundColor: Colors.black,
+            appBar: AppBar(
+              title: Text(
+                mode.parentDir?.path == common.sDCardDir
+                    ? 'SD card'
+                    : p.basename(mode.parentDir.path),
+              ),
+              centerTitle: true,
+              elevation: 0.0,
+              //浮起来的高度
+              leading: mode.parentDir?.path == common.sDCardDir
+                  ? Container()
+                  : IconButton(
+                      icon: Icon(
+                        Icons.arrow_left,
+                      ),
+                      onPressed: onWillPop,
+                    ), //再标题前面显示的一个控件
             ),
-            Expanded(
-              child: _fileListView(rightFiles, 1),
-            ),
-          ],
+            body: returnBody(),
+            bottomNavigationBar: returnBottomBar(),
+          ),
         );
       },
     );
   }
 
-  Widget returnBottomBar() {
+  Widget returnBody() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Expanded(
-          child: CupertinoButton(
-            child: Icon(Icons.add),
-            onPressed: () {
-              moreAction(-1);
-            },
-          ),
+          child: _fileListView(leftFiles, -1),
         ),
         Expanded(
-          child: CupertinoButton(
-            child: Icon(Icons.home),
-            onPressed: () {
-              new Operation(leftFiles, rightFiles, context,
-                      uiShouldChange: uiShouldChange, mode: mode)
-                  .initPathFiles(common.sDCardDir, -2);
-            },
-          ),
-        ),
-        Expanded(
-          child: CupertinoButton(
-            child: Icon(Icons.favorite),
-            onPressed: () {
-              listFavorite();
-            },
-          ),
-        ),
-        Expanded(
-          child: CupertinoButton(
-            child: Icon(Icons.add),
-            onPressed: () {
-              moreAction(1);
-            },
-          ),
+          child: _fileListView(rightFiles, 1),
         ),
       ],
+    );
+  }
+
+  Widget returnBottomBar() {
+    return Container(
+      color: Color(0x44000000),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            child: CupertinoButton(
+              child: Icon(Icons.add),
+              onPressed: () {
+                moreAction(-1);
+              },
+            ),
+          ),
+          Expanded(
+            child: CupertinoButton(
+              child: Icon(Icons.home),
+              onPressed: () {
+                new Operation(leftFiles, rightFiles, context,
+                        uiShouldChange: uiShouldChange, mode: mode)
+                    .initPathFiles(common.sDCardDir, -2);
+              },
+            ),
+          ),
+          Expanded(
+            child: CupertinoButton(
+              child: Icon(Icons.favorite),
+              onPressed: () {
+                listFavorite();
+              },
+            ),
+          ),
+          Expanded(
+            child: CupertinoButton(
+              child: Icon(Icons.add),
+              onPressed: () {
+                moreAction(1);
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -192,11 +195,13 @@ class _MyHomePageState extends State<MyHome> {
     String modifiledTime = DateFormat('yyyy-MM-dd HH:mm:ss', 'zh_CN')
         .format(file.statSync().modified.toLocal());
     FilePre fileIcon;
-
-    fileIcon = ProxyFilePre(common, file, p.extension(file.path));
-    // print('走着1');
-
-      // fileIcon = RealFilePre(common, file, p.extension(file.path));
+    fileIcon = ProxyFilePre(
+      common,
+      file,
+      p.extension(file.path),
+      50,
+      70,
+    );
 
     ///InkWell: 水波纹效果
     return InkWell(
@@ -206,7 +211,6 @@ class _MyHomePageState extends State<MyHome> {
           border: Border(bottom: BorderSide(width: 0.5, color: Colors.black12)),
         ),
         child: ListTile(
-          // leading: ProxyFilePre(common, file, p.extension(file.path)),
           leading: fileIcon,
           title: Text(file.path.substring(file.parent.path.length + 1),
               style: TextStyle(fontSize: fileFontSize)),
@@ -222,6 +226,36 @@ class _MyHomePageState extends State<MyHome> {
         OpenFile.open(file.path);
       },
       onLongPress: () {
+        Container fileIconPre;
+        FilePre filePre = ProxyFilePre(
+          common,
+          file,
+          p.extension(file.path),
+          MediaQuery.of(context).size.width / 2 - 40,
+          MediaQuery.of(context).size.width / 2 - 40,
+        );
+        if (p.extension(file.path) == '.txt') {
+          filePre = TxtFilePre(filePre);
+          fileIconPre=Container(
+            margin: EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Color(0x22ffffff),
+              // border: new Border.all(width: 1, color: Colors.red),
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            ),
+            width: MediaQuery.of(context).size.width / 2,
+            child:ListView(children: <Widget>[Text((filePre as TxtFilePre).getContent())],),
+          );
+        } else {
+          fileIconPre = Container(
+            width: MediaQuery.of(context).size.width / 2,
+            child: Padding(
+              padding: const EdgeInsets.all(14.0),
+              child: filePre,
+            ),
+          );
+        }
         showModalBottomSheet(
             backgroundColor: Color(0x00000000),
             context: context,
@@ -231,26 +265,41 @@ class _MyHomePageState extends State<MyHome> {
                     sigmaX: 5.0,
                     sigmaY: 5.0,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: type == -1
-                        ? CrossAxisAlignment.start
-                        : CrossAxisAlignment.end,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      new RenameOperationButton(context, file, type, leftFiles,
-                              rightFiles, uiShouldChange, mode)
-                          .returnButton(),
-                      new CopyOperationButton(context, file, type, mode)
-                          .returnButton(),
-                      new CutOperationButton(context, file, type, mode)
-                          .returnButton(),
-                      new AddToOperationButton(context, file, type)
-                          .returnButton(),
-                      new RemoveFavOperation(context, file, type)
-                          .returnButton(),
-                      new DeleteOperationButton(context, file, type, leftFiles,
-                              rightFiles, mode, uiShouldChange)
-                          .returnButton(),
+                      type == -1
+                          ? Container(
+                              width: 0,
+                            )
+                          : fileIconPre,
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: type == -1
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.end,
+                        children: <Widget>[
+                          RenameOperationButton(context, file, type, leftFiles,
+                                  rightFiles, uiShouldChange, mode)
+                              .returnButton(),
+                          CopyOperationButton(context, file, type, mode)
+                              .returnButton(),
+                          CutOperationButton(context, file, type, mode)
+                              .returnButton(),
+                          AddToOperationButton(context, file, type)
+                              .returnButton(),
+                          RemoveFavOperation(context, file, type)
+                              .returnButton(),
+                          DeleteOperationButton(context, file, type, leftFiles,
+                                  rightFiles, mode, uiShouldChange)
+                              .returnButton(),
+                        ],
+                      ),
+                      type == -1
+                          ? fileIconPre
+                          : Container(
+                              width: 0,
+                            ),
                     ],
                   ));
             });
@@ -264,7 +313,7 @@ class _MyHomePageState extends State<MyHome> {
     //InkWell: 水波纹效果
 
     return Card(
-      color: Color(0xff111111),
+      color: Color(0xff222222),
       elevation: 15.0,
       margin: EdgeInsets.only(left: 5, right: 5, bottom: 5, top: 5),
       child: InkWell(
@@ -302,7 +351,6 @@ class _MyHomePageState extends State<MyHome> {
               ),
         ),
         onTap: () {
-//          initPathFiles(file.path, type);
           new Operation(leftFiles, rightFiles, context,
                   uiShouldChange: uiShouldChange, mode: mode)
               .initPathFiles(file.path, type);

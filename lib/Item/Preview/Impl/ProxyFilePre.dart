@@ -16,11 +16,11 @@ class ProxyFilePre extends FilePre {
   double fileWidth = 70.0;
   RealFilePre realFilePre;
 
-  ProxyFilePre(this.common, this.file, this.extension);
+  ProxyFilePre(this.common, this.file, this.extension,this.fileHeight,this.fileWidth);
 
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: returnRealFIlePre(common, file, extension),
+      future: returnRealFIlePre(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return realFilePre;
@@ -41,7 +41,7 @@ class ProxyFilePre extends FilePre {
     );
   }
 
-  Future<Widget> returnRealFIlePre(common, file, extension) async {
-    return realFilePre = new RealFilePre(common, file, extension);
+  Future<Widget> returnRealFIlePre() async {
+    return realFilePre = new RealFilePre(common, file, extension,fileHeight,fileWidth);
   }
 }
