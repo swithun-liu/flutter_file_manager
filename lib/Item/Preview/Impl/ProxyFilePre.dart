@@ -19,6 +19,7 @@ class ProxyFilePre extends FilePre {
   ProxyFilePre(this.common, this.file, this.extension,this.fileHeight,this.fileWidth);
 
   Widget build(BuildContext context) {
+    // 对加载情况进行判断,如果加载完成才展示图片,否则展示一个小的代理图片
     return FutureBuilder(
       future: returnRealFIlePre(),
       builder: (context, snapshot) {
@@ -40,7 +41,7 @@ class ProxyFilePre extends FilePre {
       },
     );
   }
-
+  // 对真实图片的异步加载
   Future<Widget> returnRealFIlePre() async {
     return realFilePre = new RealFilePre(common, file, extension,fileHeight,fileWidth);
   }

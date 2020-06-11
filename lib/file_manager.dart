@@ -202,7 +202,6 @@ class _MyHomePageState extends State<MyHome> {
       50,
       70,
     );
-
     ///InkWell: 水波纹效果
     return InkWell(
       child: Container(
@@ -214,7 +213,6 @@ class _MyHomePageState extends State<MyHome> {
           leading: fileIcon,
           title: Text(file.path.substring(file.parent.path.length + 1),
               style: TextStyle(fontSize: fileFontSize)),
-
           ///从文件路径中截取文件名字 (file.parent.length+1-文件父目录长度)
           subtitle: Text(
             '$modifiledTime ${common.getFileSize(file.statSync().size)}',
@@ -311,7 +309,6 @@ class _MyHomePageState extends State<MyHome> {
     String modifiledTime = DateFormat('yyyy-MM-dd HH:mm:ss', 'zh_CN')
         .format(file.statSync().modified.toLocal());
     //InkWell: 水波纹效果
-
     return Card(
       color: Color(0xff222222),
       elevation: 15.0,
@@ -414,22 +411,6 @@ class _MyHomePageState extends State<MyHome> {
       ),
     );
   }
-
-  //////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////
-
   //粘贴要复制的文件
   //左右两边的加号
   void moreAction(int side) {
@@ -490,7 +471,6 @@ class _MyHomePageState extends State<MyHome> {
                                         print('删除' + temp.path);
                                       }
                                       if (side == -1) {
-//                                        initPathFiles(parentDir.path, -3);
                                         new Operation(
                                                 leftFiles, rightFiles, context,
                                                 uiShouldChange: uiShouldChange,
@@ -498,7 +478,6 @@ class _MyHomePageState extends State<MyHome> {
                                             .initPathFiles(
                                                 mode.parentDir.path, -3);
                                       } else {
-//                                        initPathFiles(parentDir.path, -3);
                                         new Operation(
                                                 leftFiles, rightFiles, context,
                                                 uiShouldChange: uiShouldChange,

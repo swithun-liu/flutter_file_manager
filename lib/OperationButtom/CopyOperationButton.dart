@@ -30,5 +30,4 @@ class CopyOperationButton extends IOptButton {
     new Operation(leftFiles, rightFiles, context, mode: mode)
         .copyToDir(file, type);
   }
-//  CopyOperationButton(this.context,this.file,this.type,this.mode);
 }

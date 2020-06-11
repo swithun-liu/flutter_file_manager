@@ -8,7 +8,6 @@ import '../Item/Common.dart';
 import '../Item/Mode.dart';
 
 class Operation {
-//  Directory parentDir; //父目录
   List<FileSystemEntity> leftFiles = []; //左列的文件
   List<FileSystemEntity> rightFiles = []; //右列的文件
   BuildContext context;
@@ -52,7 +51,6 @@ class Operation {
               )
             ],
           );
-          Navigator.pop(context);
         });
   }
 

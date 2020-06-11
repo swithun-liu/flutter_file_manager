@@ -13,8 +13,6 @@ class RemoveFavOperation extends IOptButton{
 
   RemoveFavOperation(BuildContext context, FileSystemEntity file, int type) : super(context, file, type);
 
-//  RemoveFavOperation(this.context, this.file, this.type,{this.parentDir,this.leftFiles,this.rightFiles}):super();
-
   @override
   void fun(FileSystemEntity file, int type) {
     new Operation(leftFiles, rightFiles, context).removeFavorite(file, type);

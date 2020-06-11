@@ -16,6 +16,7 @@ class RealFilePre extends FilePre {
   RealFilePre(this.common, this.file, this.extension,this.fileHeight,this.fileWidth);
 
   Widget build(BuildContext context) {
+    // 如果是图片类型的文件返回图片,否则返回文件图标
     if (extension == '.png' || extension == '.jpg' || extension == '.jpeg'||extension=='.gif') {
       print('RealFilePre创建图片');
       return ClipRRect(
