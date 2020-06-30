@@ -1,17 +1,17 @@
 # Summary
 
-Date : 2020-06-07 18:04:33
+Date : 2020-06-12 16:52:33
 
 Directory d:\a-Projects\VS code\FLUTTER\neo_file_manager
 
-Total : 44 files,  1759 codes, 203 comments, 207 blanks, all 2169 lines
+Total : 44 files,  1758 codes, 188 comments, 199 blanks, all 2145 lines
 
 [details](details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Dart | 20 | 1,317 | 108 | 136 | 1,561 |
+| Dart | 20 | 1,316 | 93 | 128 | 1,537 |
 | JSON | 2 | 145 | 0 | 2 | 147 |
 | XML | 7 | 127 | 40 | 11 | 178 |
 | Groovy | 3 | 102 | 8 | 22 | 132 |
@@ -25,7 +25,7 @@ Total : 44 files,  1759 codes, 203 comments, 207 blanks, all 2169 lines
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 44 | 1,759 | 203 | 207 | 2,169 |
+| . | 44 | 1,758 | 188 | 199 | 2,145 |
 | .gradle | 3 | 1 | 1 | 3 | 5 |
 | .gradle\5.2.1 | 1 | 0 | 0 | 1 | 1 |
 | .gradle\buildOutputCleanup | 1 | 1 | 1 | 1 | 3 |
@@ -51,12 +51,12 @@ Total : 44 files,  1759 codes, 203 comments, 207 blanks, all 2169 lines
 | ios\Runner\Assets.xcassets\AppIcon.appiconset | 1 | 122 | 0 | 1 | 123 |
 | ios\Runner\Assets.xcassets\LaunchImage.imageset | 2 | 26 | 0 | 3 | 29 |
 | ios\Runner\Base.lproj | 2 | 61 | 2 | 2 | 65 |
-| lib | 19 | 1,303 | 98 | 129 | 1,530 |
-| lib\Item | 8 | 236 | 7 | 30 | 273 |
-| lib\Item\Preview | 5 | 96 | 0 | 16 | 112 |
-| lib\Item\Preview\Impl | 4 | 89 | 0 | 15 | 104 |
-| lib\OperationButtom | 8 | 198 | 7 | 51 | 256 |
-| lib\Opertaion | 1 | 303 | 37 | 16 | 356 |
+| lib | 19 | 1,302 | 83 | 121 | 1,506 |
+| lib\Item | 8 | 236 | 11 | 29 | 276 |
+| lib\Item\Preview | 5 | 96 | 4 | 15 | 115 |
+| lib\Item\Preview\Impl | 4 | 89 | 4 | 14 | 107 |
+| lib\OperationButtom | 8 | 198 | 5 | 49 | 252 |
+| lib\Opertaion | 1 | 302 | 36 | 16 | 354 |
 | test | 1 | 14 | 10 | 7 | 31 |
 
 [details](details.md)

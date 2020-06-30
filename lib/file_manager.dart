@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:intl/intl.dart';
 import 'package:neofilemanager/Item/Preview/FilePre.dart';
 import 'package:neofilemanager/Item/Preview/Impl/ProxyFilePre.dart';
@@ -181,16 +182,16 @@ class _MyHomePageState extends State<MyHome> {
             itemCount: files.length,
             itemBuilder: (BuildContext context, int index) {
               if (FileSystemEntity.isFileSync(files[index].path))
-                return _buildFileItem(files[index], type);
+                return _buildFileItem(files[index], type, index);
               else
-                return _buildFolderItem(files[index], type);
+                return _buildFolderItem(files[index], type, index);
             }),
       );
     }
   }
 
   /// 创建文件的ListTile
-  Widget _buildFileItem(FileSystemEntity file, int type) {
+  Widget _buildFileItem(FileSystemEntity file, int type, int index) {
     //获取文件最后改动日期
     String modifiledTime = DateFormat('yyyy-MM-dd HH:mm:ss', 'zh_CN')
         .format(file.statSync().modified.toLocal());
@@ -202,6 +203,7 @@ class _MyHomePageState extends State<MyHome> {
       50,
       70,
     );
+    Image tempImage;
     ///InkWell: 水波纹效果
     return InkWell(
       child: Container(
@@ -210,7 +212,16 @@ class _MyHomePageState extends State<MyHome> {
           border: Border(bottom: BorderSide(width: 0.5, color: Colors.black12)),
         ),
         child: ListTile(
-          leading: fileIcon,
+          leading: FutureBuilder(
+            future: (file,tempImage)async{
+              return tempImage;
+            },
+            builder: (context,snapshot){
+                if(snapshot.connectionState==ConnectionState.done){
+                  
+                }
+            }
+          ),
           title: Text(file.path.substring(file.parent.path.length + 1),
               style: TextStyle(fontSize: fileFontSize)),
           ///从文件路径中截取文件名字 (file.parent.length+1-文件父目录长度)
@@ -225,25 +236,20 @@ class _MyHomePageState extends State<MyHome> {
       },
       onLongPress: () {
         Container fileIconPre;
-        FilePre filePre = ProxyFilePre(
-          common,
-          file,
-          p.extension(file.path),
-          MediaQuery.of(context).size.width / 2 - 40,
-          MediaQuery.of(context).size.width / 2 - 40,
-        );
+        FilePre filePre;
         if (p.extension(file.path) == '.txt') {
           filePre = TxtFilePre(filePre);
-          fileIconPre=Container(
+          fileIconPre = Container(
             margin: EdgeInsets.all(10),
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Color(0x22ffffff),
-              // border: new Border.all(width: 1, color: Colors.red),
               borderRadius: BorderRadius.all(Radius.circular(5)),
             ),
             width: MediaQuery.of(context).size.width / 2,
-            child:ListView(children: <Widget>[Text((filePre as TxtFilePre).getContent())],),
+            child: ListView(
+              children: <Widget>[Text((filePre as TxtFilePre).getContent())],
+            ),
           );
         } else {
           fileIconPre = Container(
@@ -305,86 +311,111 @@ class _MyHomePageState extends State<MyHome> {
     );
   }
 
-  Widget _buildFolderItem(FileSystemEntity file, int type) {
+  Future<Widget> getPreview(file) async{
+       return Image.file(file, height:30, width:40, fit: BoxFit.cover);
+  }
+
+  Widget _buildFolderItem(FileSystemEntity file, int type, int index) {
     String modifiledTime = DateFormat('yyyy-MM-dd HH:mm:ss', 'zh_CN')
         .format(file.statSync().modified.toLocal());
     //InkWell: 水波纹效果
-    return Card(
-      color: Color(0xff222222),
-      elevation: 15.0,
-      margin: EdgeInsets.only(left: 5, right: 5, bottom: 5, top: 5),
-      child: InkWell(
-        child: Container(
-          decoration: BoxDecoration(
+    return AnimationConfiguration.staggeredList(
+      position: index,
+      duration: const Duration(milliseconds: 100),
+      child: SlideAnimation(
+        horizontalOffset: 50,
+        child: FadeInAnimation(
+          child: Card(
+            color: Color(0xff222222),
+            elevation: 15.0,
+            margin: EdgeInsets.only(left: 5, right: 5, bottom: 5, top: 5),
+            child: InkWell(
+              child: Container(
+                decoration: BoxDecoration(
 //            color: Colors.black,
 //            border:
 //                Border(bottom: BorderSide(width: 0.5, color: Colors.white)),
-              ),
-          child: ListTile(
-              leading: Image.asset(
-                'assets/images/folder.png',
-                height: iconHeight,
-                width: iconWidth,
-              ),
-              title: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                        file.path.substring(file.parent.path.length + 1),
-                        style: TextStyle(fontSize: fileFontSize)),
-                  ),
-                ],
-              ),
-              subtitle: Text(
-                modifiledTime,
-                style: TextStyle(fontSize: subTitleFontSize),
-              ),
-              trailing: Icon(
-                Icons.arrow_right,
-                size: 12.0,
-              )
-
-              ///trailing: 和leading相对,最后面
-              ),
-        ),
-        onTap: () {
-          new Operation(leftFiles, rightFiles, context,
-                  uiShouldChange: uiShouldChange, mode: mode)
-              .initPathFiles(file.path, type);
-        },
-        onLongPress: () {
-          showModalBottomSheet(
-              backgroundColor: Color(0x00000000),
-              context: context,
-              builder: (BuildContext context) {
-                return BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: 5.0,
-                    sigmaY: 5.0,
-                  ),
-                  child: Container(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: type == -1
-                          ? CrossAxisAlignment.start
-                          : CrossAxisAlignment.end,
+                    ),
+                child: ListTile(
+                    leading: Image.asset(
+                      'assets/images/folder.png',
+                      height: iconHeight,
+                      width: iconWidth,
+                    ),
+                    title: Row(
                       children: <Widget>[
-                        new RenameOperationButton(context, file, type,
-                                leftFiles, rightFiles, uiShouldChange, mode)
-                            .returnButton(),
-                        new AddToOperationButton(context, file, type)
-                            .returnButton(),
-                        new RemoveFavOperation(context, file, type)
-                            .returnButton(),
-                        new DeleteOperationButton(context, file, type,
-                                leftFiles, rightFiles, mode, uiShouldChange)
-                            .returnButton(),
+                        Expanded(
+                          child: Text(
+                              file.path.substring(file.parent.path.length + 1),
+                              style: TextStyle(fontSize: fileFontSize)),
+                        ),
                       ],
                     ),
-                  ),
-                );
-              });
-        },
+                    subtitle: Text(
+                      modifiledTime,
+                      style: TextStyle(fontSize: subTitleFontSize),
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_right,
+                      size: 12.0,
+                    )
+
+                    ///trailing: 和leading相对,最后面
+                    ),
+              ),
+              onTap: () {
+                new Operation(leftFiles, rightFiles, context,
+                        uiShouldChange: uiShouldChange, mode: mode)
+                    .initPathFiles(file.path, type);
+              },
+              onLongPress: () {
+                showModalBottomSheet(
+                    backgroundColor: Color(0x00000000),
+                    context: context,
+                    builder: (BuildContext context) {
+                      return BackdropFilter(
+                        filter: ImageFilter.blur(
+                          sigmaX: 5.0,
+                          sigmaY: 5.0,
+                        ),
+                        child: Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: type == -1
+                                ? CrossAxisAlignment.start
+                                : CrossAxisAlignment.end,
+                            children: <Widget>[
+                              new RenameOperationButton(
+                                      context,
+                                      file,
+                                      type,
+                                      leftFiles,
+                                      rightFiles,
+                                      uiShouldChange,
+                                      mode)
+                                  .returnButton(),
+                              new AddToOperationButton(context, file, type)
+                                  .returnButton(),
+                              new RemoveFavOperation(context, file, type)
+                                  .returnButton(),
+                              new DeleteOperationButton(
+                                      context,
+                                      file,
+                                      type,
+                                      leftFiles,
+                                      rightFiles,
+                                      mode,
+                                      uiShouldChange)
+                                  .returnButton(),
+                            ],
+                          ),
+                        ),
+                      );
+                    });
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -411,6 +442,7 @@ class _MyHomePageState extends State<MyHome> {
       ),
     );
   }
+
   //粘贴要复制的文件
   //左右两边的加号
   void moreAction(int side) {

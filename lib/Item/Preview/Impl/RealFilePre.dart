@@ -13,22 +13,22 @@ class RealFilePre extends FilePre {
   double fileHeight = 50.0;
   double fileWidth = 70.0;
 
-  RealFilePre(this.common, this.file, this.extension,this.fileHeight,this.fileWidth);
+  RealFilePre(
+      this.common, this.file, this.extension, this.fileHeight, this.fileWidth);
 
   Widget build(BuildContext context) {
+    print('开始加载'+file.path);
     // 如果是图片类型的文件返回图片,否则返回文件图标
-    if (extension == '.png' || extension == '.jpg' || extension == '.jpeg'||extension=='.gif') {
-      print('RealFilePre创建图片');
+    if (extension == '.png' || extension == '.jpg' || extension == '.jpeg' || extension == '.gif') {
+       Image tempImage=Image.file(file, height: fileHeight, width: fileWidth, fit: BoxFit.cover);
+    print('加载完毕'+file.path);
       return ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child: Image.file(file,
-            height: fileHeight, width: fileWidth, fit: BoxFit.cover),
+        child: tempImage,
+      );
+    } else {
+      return Image.asset( common.selectIcon(extension), height: iconHeight, width: iconWidth,
       );
     }
-    return Image.asset(
-      common.selectIcon(extension),
-      height: iconHeight,
-      width: iconWidth,
-    );
   }
 }

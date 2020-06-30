@@ -1,10 +1,10 @@
 # Details
 
-Date : 2020-06-07 18:04:33
+Date : 2020-06-12 16:52:33
 
 Directory d:\a-Projects\VS code\FLUTTER\neo_file_manager
 
-Total : 44 files,  1759 codes, 203 comments, 207 blanks, all 2169 lines
+Total : 44 files,  1758 codes, 188 comments, 199 blanks, all 2145 lines
 
 [summary](results.md)
 
@@ -38,20 +38,20 @@ Total : 44 files,  1759 codes, 203 comments, 207 blanks, all 2169 lines
 | [lib/Item/Mode.dart](/lib/Item/Mode.dart) | Dart | 8 | 0 | 2 | 10 |
 | [lib/Item/Preview/FilePre.dart](/lib/Item/Preview/FilePre.dart) | Dart | 7 | 0 | 1 | 8 |
 | [lib/Item/Preview/Impl/FilePreDecrator.dart](/lib/Item/Preview/Impl/FilePreDecrator.dart) | Dart | 6 | 0 | 1 | 7 |
-| [lib/Item/Preview/Impl/ProxyFilePre.dart](/lib/Item/Preview/Impl/ProxyFilePre.dart) | Dart | 42 | 0 | 6 | 48 |
-| [lib/Item/Preview/Impl/RealFilePre.dart](/lib/Item/Preview/Impl/RealFilePre.dart) | Dart | 29 | 0 | 5 | 34 |
-| [lib/Item/Preview/Impl/TxtFilePre.dart](/lib/Item/Preview/Impl/TxtFilePre.dart) | Dart | 12 | 0 | 3 | 15 |
+| [lib/Item/Preview/Impl/ProxyFilePre.dart](/lib/Item/Preview/Impl/ProxyFilePre.dart) | Dart | 42 | 2 | 5 | 49 |
+| [lib/Item/Preview/Impl/RealFilePre.dart](/lib/Item/Preview/Impl/RealFilePre.dart) | Dart | 29 | 1 | 5 | 35 |
+| [lib/Item/Preview/Impl/TxtFilePre.dart](/lib/Item/Preview/Impl/TxtFilePre.dart) | Dart | 12 | 1 | 3 | 16 |
 | [lib/Item/widgetItem.dart](/lib/Item/widgetItem.dart) | Dart | 57 | 0 | 7 | 64 |
-| [lib/OperationButtom/AddToFavOperationButton.dart](/lib/OperationButtom/AddToFavOperationButton.dart) | Dart | 17 | 1 | 8 | 26 |
-| [lib/OperationButtom/CopyOperationButton.dart](/lib/OperationButtom/CopyOperationButton.dart) | Dart | 27 | 2 | 6 | 35 |
+| [lib/OperationButtom/AddToFavOperationButton.dart](/lib/OperationButtom/AddToFavOperationButton.dart) | Dart | 17 | 0 | 7 | 24 |
+| [lib/OperationButtom/CopyOperationButton.dart](/lib/OperationButtom/CopyOperationButton.dart) | Dart | 27 | 1 | 6 | 34 |
 | [lib/OperationButtom/CutOperationButton.dart](/lib/OperationButtom/CutOperationButton.dart) | Dart | 23 | 1 | 7 | 31 |
 | [lib/OperationButtom/DeleteOperationButton.dart](/lib/OperationButtom/DeleteOperationButton.dart) | Dart | 34 | 1 | 9 | 44 |
 | [lib/OperationButtom/IOperateButtonBusiness.dart](/lib/OperationButtom/IOperateButtonBusiness.dart) | Dart | 9 | 0 | 4 | 13 |
-| [lib/OperationButtom/IOptButton.dart](/lib/OperationButtom/IOptButton.dart) | Dart | 40 | 0 | 5 | 45 |
-| [lib/OperationButtom/RemoveFavOperationButton.dart](/lib/OperationButtom/RemoveFavOperationButton.dart) | Dart | 17 | 1 | 5 | 23 |
+| [lib/OperationButtom/IOptButton.dart](/lib/OperationButtom/IOptButton.dart) | Dart | 40 | 1 | 5 | 46 |
+| [lib/OperationButtom/RemoveFavOperationButton.dart](/lib/OperationButtom/RemoveFavOperationButton.dart) | Dart | 17 | 0 | 4 | 21 |
 | [lib/OperationButtom/RenameOperationButton.dart](/lib/OperationButtom/RenameOperationButton.dart) | Dart | 31 | 1 | 7 | 39 |
-| [lib/Opertaion/Operation.dart](/lib/Opertaion/Operation.dart) | Dart | 303 | 37 | 16 | 356 |
-| [lib/file_manager.dart](/lib/file_manager.dart) | Dart | 506 | 38 | 23 | 567 |
+| [lib/Opertaion/Operation.dart](/lib/Opertaion/Operation.dart) | Dart | 302 | 36 | 16 | 354 |
+| [lib/file_manager.dart](/lib/file_manager.dart) | Dart | 506 | 22 | 18 | 546 |
 | [lib/main.dart](/lib/main.dart) | Dart | 60 | 9 | 9 | 78 |
 | [pubspec.yaml](/pubspec.yaml) | YAML | 22 | 45 | 13 | 80 |
 | [test/widget_test.dart](/test/widget_test.dart) | Dart | 14 | 10 | 7 | 31 |

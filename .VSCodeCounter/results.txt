@@ -1,12 +1,12 @@
-Date : 2020-06-07 18:04:33
+Date : 2020-06-12 16:52:33
 Directory : d:\a-Projects\VS code\FLUTTER\neo_file_manager
-Total : 44 files,  1759 codes, 203 comments, 207 blanks, all 2169 lines
+Total : 44 files,  1758 codes, 188 comments, 199 blanks, all 2145 lines
 
 Languages
 +------------+------------+------------+------------+------------+------------+
 | language   | files      | code       | comment    | blank      | total      |
 +------------+------------+------------+------------+------------+------------+
-| Dart       |         20 |      1,317 |        108 |        136 |      1,561 |
+| Dart       |         20 |      1,316 |         93 |        128 |      1,537 |
 | JSON       |          2 |        145 |          0 |          2 |        147 |
 | XML        |          7 |        127 |         40 |         11 |        178 |
 | Groovy     |          3 |        102 |          8 |         22 |        132 |
@@ -22,7 +22,7 @@ Directories
 +----------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
 | path                                                                                                                 | files      | code       | comment    | blank      | total      |
 +----------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
-| .                                                                                                                    |         44 |      1,759 |        203 |        207 |      2,169 |
+| .                                                                                                                    |         44 |      1,758 |        188 |        199 |      2,145 |
 | .gradle                                                                                                              |          3 |          1 |          1 |          3 |          5 |
 | .gradle\5.2.1                                                                                                        |          1 |          0 |          0 |          1 |          1 |
 | .gradle\buildOutputCleanup                                                                                           |          1 |          1 |          1 |          1 |          3 |
@@ -48,12 +48,12 @@ Directories
 | ios\Runner\Assets.xcassets\AppIcon.appiconset                                                                        |          1 |        122 |          0 |          1 |        123 |
 | ios\Runner\Assets.xcassets\LaunchImage.imageset                                                                      |          2 |         26 |          0 |          3 |         29 |
 | ios\Runner\Base.lproj                                                                                                |          2 |         61 |          2 |          2 |         65 |
-| lib                                                                                                                  |         19 |      1,303 |         98 |        129 |      1,530 |
-| lib\Item                                                                                                             |          8 |        236 |          7 |         30 |        273 |
-| lib\Item\Preview                                                                                                     |          5 |         96 |          0 |         16 |        112 |
-| lib\Item\Preview\Impl                                                                                                |          4 |         89 |          0 |         15 |        104 |
-| lib\OperationButtom                                                                                                  |          8 |        198 |          7 |         51 |        256 |
-| lib\Opertaion                                                                                                        |          1 |        303 |         37 |         16 |        356 |
+| lib                                                                                                                  |         19 |      1,302 |         83 |        121 |      1,506 |
+| lib\Item                                                                                                             |          8 |        236 |         11 |         29 |        276 |
+| lib\Item\Preview                                                                                                     |          5 |         96 |          4 |         15 |        115 |
+| lib\Item\Preview\Impl                                                                                                |          4 |         89 |          4 |         14 |        107 |
+| lib\OperationButtom                                                                                                  |          8 |        198 |          5 |         49 |        252 |
+| lib\Opertaion                                                                                                        |          1 |        302 |         36 |         16 |        354 |
 | test                                                                                                                 |          1 |         14 |         10 |          7 |         31 |
 +----------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
 
@@ -88,22 +88,22 @@ Files
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\Mode.dart                                                    | Dart       |          8 |          0 |          2 |         10 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\Preview\FilePre.dart                                         | Dart       |          7 |          0 |          1 |          8 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\Preview\Impl\FilePreDecrator.dart                            | Dart       |          6 |          0 |          1 |          7 |
-| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\Preview\Impl\ProxyFilePre.dart                               | Dart       |         42 |          0 |          6 |         48 |
-| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\Preview\Impl\RealFilePre.dart                                | Dart       |         29 |          0 |          5 |         34 |
-| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\Preview\Impl\TxtFilePre.dart                                 | Dart       |         12 |          0 |          3 |         15 |
+| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\Preview\Impl\ProxyFilePre.dart                               | Dart       |         42 |          2 |          5 |         49 |
+| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\Preview\Impl\RealFilePre.dart                                | Dart       |         29 |          1 |          5 |         35 |
+| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\Preview\Impl\TxtFilePre.dart                                 | Dart       |         12 |          1 |          3 |         16 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Item\widgetItem.dart                                              | Dart       |         57 |          0 |          7 |         64 |
-| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\AddToFavOperationButton.dart                      | Dart       |         17 |          1 |          8 |         26 |
-| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\CopyOperationButton.dart                          | Dart       |         27 |          2 |          6 |         35 |
+| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\AddToFavOperationButton.dart                      | Dart       |         17 |          0 |          7 |         24 |
+| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\CopyOperationButton.dart                          | Dart       |         27 |          1 |          6 |         34 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\CutOperationButton.dart                           | Dart       |         23 |          1 |          7 |         31 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\DeleteOperationButton.dart                        | Dart       |         34 |          1 |          9 |         44 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\IOperateButtonBusiness.dart                       | Dart       |          9 |          0 |          4 |         13 |
-| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\IOptButton.dart                                   | Dart       |         40 |          0 |          5 |         45 |
-| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\RemoveFavOperationButton.dart                     | Dart       |         17 |          1 |          5 |         23 |
+| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\IOptButton.dart                                   | Dart       |         40 |          1 |          5 |         46 |
+| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\RemoveFavOperationButton.dart                     | Dart       |         17 |          0 |          4 |         21 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\OperationButtom\RenameOperationButton.dart                        | Dart       |         31 |          1 |          7 |         39 |
-| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Opertaion\Operation.dart                                          | Dart       |        303 |         37 |         16 |        356 |
-| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\file_manager.dart                                                 | Dart       |        506 |         38 |         23 |        567 |
+| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\Opertaion\Operation.dart                                          | Dart       |        302 |         36 |         16 |        354 |
+| d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\file_manager.dart                                                 | Dart       |        506 |         22 |         18 |        546 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\lib\main.dart                                                         | Dart       |         60 |          9 |          9 |         78 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\pubspec.yaml                                                          | YAML       |         22 |         45 |         13 |         80 |
 | d:\a-Projects\VS code\FLUTTER\neo_file_manager\test\widget_test.dart                                                 | Dart       |         14 |         10 |          7 |         31 |
-| Total                                                                                                                |            |      1,759 |        203 |        207 |      2,169 |
+| Total                                                                                                                |            |      1,758 |        188 |        199 |      2,145 |
 +----------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
